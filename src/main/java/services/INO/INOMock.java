@@ -42,5 +42,26 @@ public abstract class INOMock {
     public abstract VerifiedClaim verifyIdentityAndGenerateClaim(VerifyRequest request);
 
 
+    protected VerifiedClaim createClaim(MerkleTree tree)
+    {
+        VerifiedClaim verifiedClaim = new VerifiedClaim();
+        verifiedClaim.setTree(tree);
+
+        String toSign = tree.getRoot().getHash();
+
+        String signature = verifiedClaimSignUtil.sign(toSign);
+
+
+        verifiedClaim.setSignature(signature);
+
+        String publicKeyStr = CryptUtil.convertPublicKeyToString(verifiedClaimSignUtil.getPublicKey());
+
+        verifiedClaim.setPublicKey(publicKeyStr);
+
+        return verifiedClaim;
+
+    }
+
+
 
 }

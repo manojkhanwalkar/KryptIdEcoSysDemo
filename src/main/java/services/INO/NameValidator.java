@@ -58,21 +58,9 @@ public class NameValidator extends INOMock {
 
         MerkleTree tree = util.build(List.of(attribNode1,attribNode2,attribNode3,attribNode4,attribNode5));
 
-        VerifiedClaim verifiedClaim = new VerifiedClaim();
-        verifiedClaim.setTree(tree);
-
-        String toSign = tree.getRoot().getHash();
-
-        String signature = verifiedClaimSignUtil.sign(toSign);
+        return createClaim(tree);
 
 
-        verifiedClaim.setSignature(signature);
-
-        String publicKeyStr = CryptUtil.convertPublicKeyToString(verifiedClaimSignUtil.getPublicKey());
-
-        verifiedClaim.setPublicKey(publicKeyStr);
-
-        return verifiedClaim;
 
     }
 

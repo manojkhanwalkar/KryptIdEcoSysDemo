@@ -49,13 +49,11 @@ public class ClaimManager {
 
         verifiedClaimSignUtil =new VerifiedClaimSignUtil(publicKey,privateKey);
 
-        //TODO - add SSN and Email validators and use regex to validate the expected patterns in all validators .
 
-        to be continued ...
 
         inoMock1 = new NameValidator(certFile1,privateFile1);
-        inoMock2 = new NameValidator(certFile2,privateFile2);
-        inoMock3 = new NameValidator(certFile3,privateFile3);
+        inoMock2 = new EmailValidator(certFile2,privateFile2);
+        inoMock3 = new SSNValidator(certFile3,privateFile3);
 
      }
 
