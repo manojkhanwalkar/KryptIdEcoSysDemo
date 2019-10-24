@@ -18,6 +18,18 @@ public class AttributeNode implements Node {
         return Objects.equals(name, that.name);
     }
 
+    public enum Status { Valid , Fraud};
+
+    Status status ;
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(name);
@@ -35,6 +47,7 @@ public class AttributeNode implements Node {
 
     String name ;
     String value;
+
 
   //  @JsonManagedReference
     LeafHashNode parent;
@@ -76,7 +89,8 @@ public class AttributeNode implements Node {
     @Override
     public String toString() {
         return "AttributeNode{" +
-                "id=" + id +
+                "status=" + status +
+                ", id=" + id +
                 ", name='" + name + '\'' +
                 ", value='" + value + '\'' +
                 '}';
