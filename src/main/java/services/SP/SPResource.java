@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import constants.Constants;
 import data.*;
 import services.client.Connection;
+import services.client.DiscoveryClient;
 import util.*;
 
 import javax.ws.rs.GET;
@@ -34,7 +35,7 @@ public class SPResource {
     String rsaPrivateFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/sprsakey.der";
 
 
-    String bureauURL = "https://172.17.0.1:8480/";
+ //   String bureauURL = "https://172.17.0.1:8480/";
 
     PublicKey publicKey;
     PrivateKey privateKey;
@@ -90,6 +91,8 @@ public class SPResource {
     }
 
 
+    DiscoveryClient discoveryClient = new DiscoveryClient(Constants.discoveryServiceUrl);
+
 
 
     @POST
@@ -115,9 +118,13 @@ public class SPResource {
 
 
 
-
         String bureauResponse = null;
         try {
+
+
+            String bureauURL = discoveryClient.service(Constants.BureauServiceType).getServiceUrl();
+
+
 
             bureau = new Connection(bureauURL,publicKey,privateKey);
 
