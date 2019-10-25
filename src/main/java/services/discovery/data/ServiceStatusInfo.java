@@ -27,6 +27,14 @@ public final class ServiceStatusInfo {
     public Map<String, ServiceStatus.Status> getServicesStatus() {
         return servicesStatus;
     }
+
+    @Override
+    public String toString() {
+        return "ServiceStatusInfo{" +
+                "serviceType='" + serviceType + '\'' +
+                ", servicesStatus=" + servicesStatus +
+                '}';
+    }
 }
 
 

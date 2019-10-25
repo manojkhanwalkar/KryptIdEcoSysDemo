@@ -19,10 +19,11 @@ public class ServiceStatusCache {
         {
             serviceStatus = new ServiceStatus();
             serviceStatusMap.put(serviceInfo.getServiceType(),serviceStatus);
+            serviceStatus.setServiceType(serviceInfo.getServiceType());
+
         }
 
         serviceStatus.add(serviceInfo.getUrl());
-        serviceStatus.setServiceType(serviceInfo.getServiceType());
 
 
     }

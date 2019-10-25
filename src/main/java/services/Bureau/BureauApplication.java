@@ -1,8 +1,10 @@
 package services.Bureau;
 
+import constants.Constants;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import util.DiscoveryLifeCycle;
 
 
 public class BureauApplication extends Application<BureauConfiguration> {
@@ -30,6 +32,9 @@ public class BureauApplication extends Application<BureauConfiguration> {
                 configuration.getTemplate(),
                 configuration.getDefaultName()
         );
+        DiscoveryLifeCycle myManagedObject = new DiscoveryLifeCycle(Constants.BureauServiceUrl,Constants.BureauServiceType);
+        environment.lifecycle().manage(myManagedObject);
+
         environment.jersey().register(resource);
     }
 

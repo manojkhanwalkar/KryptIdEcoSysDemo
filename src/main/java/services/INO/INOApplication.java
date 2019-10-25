@@ -1,14 +1,19 @@
 package services.INO;
 
+import constants.Constants;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import services.client.DiscoveryClient;
+import util.DiscoveryLifeCycle;
 
 
 public class INOApplication extends Application<INOConfiguration> {
     public static void main(String[] args) throws Exception {
         new INOApplication().run(args);
     }
+
+
 
     @Override
     public String getName() {
@@ -18,7 +23,9 @@ public class INOApplication extends Application<INOConfiguration> {
     @Override
     public void initialize(Bootstrap<INOConfiguration> bootstrap) {
 
-    //    IDStatusPollManager.getInstance().start();
+
+
+        //    IDStatusPollManager.getInstance().start();
 
         // nothing to do yet
     }
@@ -30,7 +37,12 @@ public class INOApplication extends Application<INOConfiguration> {
                 configuration.getTemplate(),
                 configuration.getDefaultName()
         );
+
+        DiscoveryLifeCycle myManagedObject = new DiscoveryLifeCycle(Constants.INOServiceUrl,Constants.INOServiceType);
+        environment.lifecycle().manage(myManagedObject);
         environment.jersey().register(resource);
+
+
     }
 
 }

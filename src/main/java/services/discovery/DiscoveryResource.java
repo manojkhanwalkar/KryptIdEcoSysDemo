@@ -72,7 +72,7 @@ public class DiscoveryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String register(ServiceInfo serviceInfo) {
 
-
+        System.out.println("Resource has been registered " + serviceInfo);
         serviceStatusCache.register(serviceInfo);
         return "Service has been registered";
 

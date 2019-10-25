@@ -1,8 +1,10 @@
 package services.SP;
 
+import constants.Constants;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import util.DiscoveryLifeCycle;
 
 
 public class SPApplication extends Application<SPConfiguration> {
@@ -30,6 +32,10 @@ public class SPApplication extends Application<SPConfiguration> {
                 configuration.getTemplate(),
                 configuration.getDefaultName()
         );
+
+        DiscoveryLifeCycle myManagedObject = new DiscoveryLifeCycle(Constants.SPServiceUrl,Constants.SPServiceType);
+        environment.lifecycle().manage(myManagedObject);
+
         environment.jersey().register(resource);
     }
 
