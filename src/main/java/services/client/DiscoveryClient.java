@@ -60,8 +60,6 @@ public class DiscoveryClient {
 
         System.out.println(response);
 
-        TypeReference<HashMap<String, ServiceStatus.Status>> typeRef
-                = new TypeReference<HashMap<String, ServiceStatus.Status>>() {};
 
         return (ServiceStatusInfo) JSONUtil.fromJSON(response,ServiceStatusInfo.class);
 

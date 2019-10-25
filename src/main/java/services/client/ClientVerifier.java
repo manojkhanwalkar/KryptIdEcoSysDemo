@@ -1,5 +1,6 @@
 package services.client;
 
+import constants.Constants;
 import data.*;
 import org.apache.commons.codec.digest.Crypt;
 import services.client.wallet.SimpleWallet;
@@ -44,6 +45,8 @@ public class ClientVerifier {
     Connection sp;
 
     SimpleWallet wallet = new SimpleWallet();
+
+
     public ClientVerifier(String inoURL, String spURL)
     {
 
@@ -195,9 +198,19 @@ public class ClientVerifier {
 
     public static void main(String[] args) throws Exception {
 
+        DiscoveryClient discoveryClient = new DiscoveryClient(Constants.discoveryServiceUrl);
 
-        ClientVerifier verifier = new ClientVerifier("https://172.17.0.1:8180/", "https://172.17.0.1:8380/");
+        String inoUrl = discoveryClient.service(Constants.INOServiceType).getServiceUrl();
 
+        String spUrl = discoveryClient.service(Constants.SPServiceType).getServiceUrl();
+
+        System.out.println("INO service available at " + inoUrl);
+
+        System.out.println("SP service available at " + spUrl);
+
+    //    ClientVerifier verifier = new ClientVerifier("https://172.17.0.1:8180/", "https://172.17.0.1:8380/");
+
+        ClientVerifier verifier = new ClientVerifier(inoUrl,spUrl);
 
 
        // verifier.exchangeKeys();
