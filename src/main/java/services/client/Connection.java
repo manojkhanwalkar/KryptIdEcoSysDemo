@@ -43,8 +43,8 @@ public class Connection {
         this.target = target;
         this.privateKey= privateKey;
         this.publicKey = publicKey;
-        final Properties props = System.getProperties();
-        props.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
+
+        initConnectionProps();
 
         client = HttpClient.newHttpClient();
 
@@ -56,6 +56,22 @@ public class Connection {
 
     }
 
+
+
+    private void initConnectionProps()
+    {
+        final Properties props = System.getProperties();
+        props.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
+
+    }
+
+    public Connection(String target)
+    {
+        this.target = target;
+        initConnectionProps();
+        client = HttpClient.newHttpClient();
+    }
+
     public void connect() throws Exception
     {
 
@@ -63,6 +79,10 @@ public class Connection {
 
     }
 
+    public String sendSimple(String request,String action) throws Exception
+    {
+        return post(request,action);
+    }
 
     public String send(String request, String action) throws Exception
     {
