@@ -13,9 +13,13 @@ import java.util.stream.Collectors;
 
 public class ServiceStatus implements Cloneable{
 
-    public void add(String url) {
+    public void add(String url, String healthUrl) {
 
-        servicesStatus.put(url,Status.Up);
+        ServiceStatusHealthCheckTuple serviceStatusHealthCheckTuple = new ServiceStatusHealthCheckTuple();
+        serviceStatusHealthCheckTuple.setHealthCheckURL(healthUrl);
+        serviceStatusHealthCheckTuple.setServiceStatus(Status.Up);
+
+        servicesStatus.put(url,serviceStatusHealthCheckTuple);
 
     }
 
@@ -26,39 +30,67 @@ public class ServiceStatus implements Cloneable{
 
     public void updateStatus(String url, Status status)
     {
-        servicesStatus.put(url,status);
+        ServiceStatusHealthCheckTuple serviceStatusHealthCheckTuple = servicesStatus.get(url);
+        serviceStatusHealthCheckTuple.setServiceStatus(status);
+
     }
 
     public  enum Status  { Up, Down};
 
 
-    @JsonProperty
-    String serviceType;
+ /*   @JsonProperty
+    String serviceType; */
 
-    Map<String,Status> servicesStatus = new HashMap<>();
+    Map<String,ServiceStatusHealthCheckTuple> servicesStatus = new HashMap<>();
 
 
-    public String getServiceType() {
+  /*  public String getServiceType() {
         return serviceType;
     }
 
     public void setServiceType(String serviceType) {
         this.serviceType = serviceType;
-    }
+    }*/
 
 
     // to be used by the cache while returning the object
     public ServiceStatusInfo clone()
     {
         ServiceStatusInfo serviceStatusInfo = new ServiceStatusInfo();
-        serviceStatusInfo.serviceType = this.serviceType;
-        serviceStatusInfo.servicesStatus.putAll(this.servicesStatus);
+        //serviceStatusInfo.serviceType = this.serviceType;
+
+        servicesStatus.entrySet().stream().forEach(entry-> {
+           serviceStatusInfo.servicesStatus.put(entry.getKey(),entry.getValue().getServiceStatus());
+        });
         return serviceStatusInfo;
     }
 
 
 
 
+}
+
+
+class ServiceStatusHealthCheckTuple
+{
+    String healthCheckURL ;
+    ServiceStatus.Status serviceStatus;
+
+    public String getHealthCheckURL() {
+        return healthCheckURL;
+    }
+
+    public void setHealthCheckURL(String healthCheckURL) {
+        this.healthCheckURL = healthCheckURL;
+    }
+
+    public ServiceStatus.Status getServiceStatus() {
+        return serviceStatus;
+    }
+
+    public void setServiceStatus(ServiceStatus.Status serviceStatus) {
+        this.serviceStatus = serviceStatus;
+    }
 }
 
 

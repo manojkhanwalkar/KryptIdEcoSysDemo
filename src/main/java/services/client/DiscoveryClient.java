@@ -1,6 +1,7 @@
 package services.client;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import constants.Constants;
 import services.discovery.data.ServiceInfo;
 import services.discovery.data.ServiceStatus;
 import services.discovery.data.ServiceStatusInfo;
@@ -30,11 +31,12 @@ public class DiscoveryClient {
 
 
 
-    public void register(String url,String type) throws Exception
+    public void register(String url,String type, String healthUrl) throws Exception
     {
         ServiceInfo serviceInfo= new ServiceInfo();
         serviceInfo.setUrl(url);
         serviceInfo.setServiceType(type);
+        serviceInfo.setHealthCheckUrl(healthUrl);
 
        String response =  discovery.sendSimple(JSONUtil.toJSON(serviceInfo),"register");
 
@@ -95,16 +97,16 @@ public class DiscoveryClient {
     public static void main(String[] args) throws Exception {
 
 
-        DiscoveryClient verifier = new DiscoveryClient("https://172.17.0.1:8580/");
+        DiscoveryClient verifier = new DiscoveryClient(Constants.discoveryServiceUrl);
 
 
-        verifier.register("https://172.17.0.1:8180/","INO");
+        verifier.register(Constants.INOServiceUrl,"INO", Constants.INOServiceHealthUrl);
 
         verifier.service("INO");
 
         verifier.watch("INO","TO BE IMPLEMENTED");
 
-        verifier.deregister("https://172.17.0.1:8180/","INO");
+        verifier.deregister(Constants.INOServiceUrl,"INO");
 
 
     }

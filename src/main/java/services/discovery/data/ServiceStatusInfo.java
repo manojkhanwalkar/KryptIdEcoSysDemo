@@ -35,6 +35,9 @@ public final class ServiceStatusInfo {
         return serviceType;
     }
 
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
+    }
 
     public Map<String, ServiceStatus.Status> getServicesStatus() {
         return servicesStatus;

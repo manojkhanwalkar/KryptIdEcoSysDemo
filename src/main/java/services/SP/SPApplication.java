@@ -33,7 +33,7 @@ public class SPApplication extends Application<SPConfiguration> {
                 configuration.getDefaultName()
         );
 
-        DiscoveryLifeCycle myManagedObject = new DiscoveryLifeCycle(Constants.SPServiceUrl,Constants.SPServiceType);
+        DiscoveryLifeCycle myManagedObject = new DiscoveryLifeCycle(Constants.SPServiceUrl,Constants.SPServiceType,Constants.SPServiceHealthUrl);
         environment.lifecycle().manage(myManagedObject);
 
         environment.jersey().register(resource);

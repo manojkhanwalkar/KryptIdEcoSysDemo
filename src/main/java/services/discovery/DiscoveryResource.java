@@ -49,7 +49,10 @@ public class DiscoveryResource {
     public ServiceStatusInfo watch(WatchInfo watchInfo) {
 
         //TODO - add watch features
-        return serviceStatusCache.getStatus(watchInfo.getServiceType()) ;
+        ServiceStatusInfo serviceStatusInfo = serviceStatusCache.getStatus(watchInfo.getServiceType()) ;
+        serviceStatusInfo.setServiceType(watchInfo.getServiceType());
+        return serviceStatusInfo;
+
 
     }
 
@@ -61,7 +64,9 @@ public class DiscoveryResource {
     public ServiceStatusInfo service(String serviceType) {
 
 
-        return serviceStatusCache.getStatus(serviceType) ;
+        ServiceStatusInfo serviceStatusInfo= serviceStatusCache.getStatus(serviceType) ;
+        serviceStatusInfo.setServiceType(serviceType);
+        return serviceStatusInfo;
 
     }
 

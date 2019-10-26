@@ -38,7 +38,7 @@ public class INOApplication extends Application<INOConfiguration> {
                 configuration.getDefaultName()
         );
 
-        DiscoveryLifeCycle myManagedObject = new DiscoveryLifeCycle(Constants.INOServiceUrl,Constants.INOServiceType);
+        DiscoveryLifeCycle myManagedObject = new DiscoveryLifeCycle(Constants.INOServiceUrl,Constants.INOServiceType, Constants.INOServiceHealthUrl);
         environment.lifecycle().manage(myManagedObject);
         environment.jersey().register(resource);
 

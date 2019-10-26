@@ -10,6 +10,8 @@ import java.util.Map;
 public class ServiceStatusCache {
 
 
+
+
     Map<String, ServiceStatus>  serviceStatusMap = new HashMap<>();
 
     public synchronized void register(ServiceInfo serviceInfo)
@@ -19,11 +21,11 @@ public class ServiceStatusCache {
         {
             serviceStatus = new ServiceStatus();
             serviceStatusMap.put(serviceInfo.getServiceType(),serviceStatus);
-            serviceStatus.setServiceType(serviceInfo.getServiceType());
+           // serviceStatus.setServiceType(serviceInfo.getServiceType());
 
         }
 
-        serviceStatus.add(serviceInfo.getUrl());
+        serviceStatus.add(serviceInfo.getUrl(),serviceInfo.getHealthCheckUrl());
 
 
     }

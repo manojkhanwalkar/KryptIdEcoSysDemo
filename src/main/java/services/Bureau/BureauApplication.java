@@ -32,7 +32,7 @@ public class BureauApplication extends Application<BureauConfiguration> {
                 configuration.getTemplate(),
                 configuration.getDefaultName()
         );
-        DiscoveryLifeCycle myManagedObject = new DiscoveryLifeCycle(Constants.BureauServiceUrl,Constants.BureauServiceType);
+        DiscoveryLifeCycle myManagedObject = new DiscoveryLifeCycle(Constants.BureauServiceUrl,Constants.BureauServiceType, Constants.BureauServiceHealthUrl);
         environment.lifecycle().manage(myManagedObject);
 
         environment.jersey().register(resource);

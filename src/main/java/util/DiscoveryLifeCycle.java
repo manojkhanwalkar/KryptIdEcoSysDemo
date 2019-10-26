@@ -12,11 +12,13 @@ public class DiscoveryLifeCycle implements Managed {
 
     final String serviceUrl ;
     final String serviceType;
+    final String healthUrl;
 
-    public DiscoveryLifeCycle(String serviceURL , String serviceType)
+    public DiscoveryLifeCycle(String serviceURL , String serviceType, String healthUrl)
     {
         this.serviceType= serviceType;
         this.serviceUrl=serviceURL;
+        this.healthUrl = healthUrl;
     }
 
 
@@ -29,7 +31,7 @@ public class DiscoveryLifeCycle implements Managed {
         System.out.println("Started the discovery lifecycle ");
         try {
             discoveryClient = new DiscoveryClient(Constants.discoveryServiceUrl);
-            discoveryClient.register(serviceUrl,serviceType);
+            discoveryClient.register(serviceUrl,serviceType,healthUrl);
         } catch (Exception e) {
             e.printStackTrace();
         }
