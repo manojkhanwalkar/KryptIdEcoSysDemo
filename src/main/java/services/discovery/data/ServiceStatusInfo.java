@@ -47,7 +47,7 @@ public final class ServiceStatusInfo {
     public String toString() {
         return "ServiceStatusInfo{" +
                 "serviceType='" + serviceType + '\'' +
-                ", servicesStatus=" + servicesStatus +
+                ", serviceInstanceStatus=" + servicesStatus +
                 '}';
     }
 }

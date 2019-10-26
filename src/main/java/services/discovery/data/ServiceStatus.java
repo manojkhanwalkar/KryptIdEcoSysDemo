@@ -1,12 +1,7 @@
 package services.discovery.data;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 
 //TODO - cache storing this status object should return a deep copy
@@ -19,18 +14,18 @@ public class ServiceStatus implements Cloneable{
         serviceStatusHealthCheckTuple.setHealthCheckURL(healthUrl);
         serviceStatusHealthCheckTuple.setServiceStatus(Status.Up);
 
-        servicesStatus.put(url,serviceStatusHealthCheckTuple);
+        serviceInstanceStatus.put(url,serviceStatusHealthCheckTuple);
 
     }
 
     public synchronized void remove(String url) {
 
-        servicesStatus.remove(url);
+        serviceInstanceStatus.remove(url);
     }
 
     public synchronized void updateStatus(String url, Status status)
     {
-        ServiceStatusHealthCheckTuple serviceStatusHealthCheckTuple = servicesStatus.get(url);
+        ServiceStatusHealthCheckTuple serviceStatusHealthCheckTuple = serviceInstanceStatus.get(url);
         serviceStatusHealthCheckTuple.setServiceStatus(status);
 
     }
@@ -41,7 +36,7 @@ public class ServiceStatus implements Cloneable{
  /*   @JsonProperty
     String serviceType; */
 
-    Map<String,ServiceStatusHealthCheckTuple> servicesStatus = new HashMap<>();
+    public Map<String,ServiceStatusHealthCheckTuple> serviceInstanceStatus = new HashMap<>();
 
 
   /*  public String getServiceType() {
@@ -59,37 +54,17 @@ public class ServiceStatus implements Cloneable{
         ServiceStatusInfo serviceStatusInfo = new ServiceStatusInfo();
         //serviceStatusInfo.serviceType = this.serviceType;
 
-        servicesStatus.entrySet().stream().forEach(entry-> {
+        serviceInstanceStatus.entrySet().stream().forEach(entry-> {
            serviceStatusInfo.servicesStatus.put(entry.getKey(),entry.getValue().getServiceStatus());
         });
         return serviceStatusInfo;
     }
 
-
-
-
-}
-
-
-class ServiceStatusHealthCheckTuple
-{
-    String healthCheckURL ;
-    ServiceStatus.Status serviceStatus;
-
-    public String getHealthCheckURL() {
-        return healthCheckURL;
-    }
-
-    public void setHealthCheckURL(String healthCheckURL) {
-        this.healthCheckURL = healthCheckURL;
-    }
-
-    public ServiceStatus.Status getServiceStatus() {
-        return serviceStatus;
-    }
-
-    public void setServiceStatus(ServiceStatus.Status serviceStatus) {
-        this.serviceStatus = serviceStatus;
+    @Override
+    public String toString() {
+        return "ServiceStatus{" +
+                "serviceInstanceStatus=" + serviceInstanceStatus +
+                '}';
     }
 }
 
