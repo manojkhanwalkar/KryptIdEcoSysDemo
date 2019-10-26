@@ -28,24 +28,24 @@ public class SPResource {
     private final AtomicLong counter;
 
 
-    String certFile = Constants.FileLocation+"KryptIdEcoSysDemo/src/main/resources/spcert.pem";
-    String privateFile = Constants.FileLocation+"KryptIdEcoSysDemo/src/main/resources/spkey.der";
+    private String certFile = Constants.FileLocation+"KryptIdEcoSysDemo/src/main/resources/spcert.pem";
+    private String privateFile = Constants.FileLocation+"KryptIdEcoSysDemo/src/main/resources/spkey.der";
 
-    String rsaCertFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/sprsacertificate.pem";
-    String rsaPrivateFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/sprsakey.der";
+    private String rsaCertFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/sprsacertificate.pem";
+    private String rsaPrivateFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/sprsakey.der";
 
 
  //   String bureauURL = "https://172.17.0.1:8480/";
 
-    PublicKey publicKey;
-    PrivateKey privateKey;
+    private PublicKey publicKey;
+    private PrivateKey privateKey;
 
-    KeyExchangeManager keyExchangeManager;
+    private KeyExchangeManager keyExchangeManager;
 
-    Connection bureau;
+    private  Connection bureau;
 
 
-    RSAKeyHolder rsaKeyHolder;
+    private RSAKeyHolder rsaKeyHolder;
 
 
     public SPResource(String template, String defaultName) {
@@ -121,6 +121,8 @@ public class SPResource {
         String bureauResponse = null;
         try {
 
+
+            discoveryClient = new DiscoveryClient(Constants.discoveryServiceUrl);
 
             String bureauURL = discoveryClient.service(Constants.BureauServiceType).getServiceUrl();
 

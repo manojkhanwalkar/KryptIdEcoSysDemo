@@ -8,11 +8,11 @@ import services.client.DiscoveryClient;
 public class DiscoveryLifeCycle implements Managed {
 
 
-    DiscoveryClient discoveryClient ;
+    private DiscoveryClient discoveryClient ;
 
-    final String serviceUrl ;
-    final String serviceType;
-    final String healthUrl;
+    private final String serviceUrl ;
+    private final String serviceType;
+    private final String healthUrl;
 
     public DiscoveryLifeCycle(String serviceURL , String serviceType, String healthUrl)
     {
@@ -23,7 +23,7 @@ public class DiscoveryLifeCycle implements Managed {
 
 
     @Override
-    public void start() throws Exception {
+    public void start()  {
         // Do something to start the object
 
 
@@ -39,11 +39,13 @@ public class DiscoveryLifeCycle implements Managed {
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop()  {
         // Do something to stop the object
 
         System.out.println("Stopped the discovery lifecycle");
         try {
+
+            discoveryClient = new DiscoveryClient(Constants.discoveryServiceUrl);
 
             discoveryClient.deregister(Constants.INOServiceUrl,Constants.INOServiceType);
         } catch (Exception e) {
