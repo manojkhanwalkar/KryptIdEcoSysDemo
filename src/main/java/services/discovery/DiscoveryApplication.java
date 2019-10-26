@@ -23,14 +23,23 @@ public class DiscoveryApplication extends Application<DiscoveryConfiguration> {
         // nothing to do yet
     }
 
+    ServiceStatusCache serviceStatusCache;
+
     @Override
     public void run(DiscoveryConfiguration configuration,
                     Environment environment) {
+
+        serviceStatusCache = new ServiceStatusCache();
         final DiscoveryResource resource = new DiscoveryResource(
                 configuration.getTemplate(),
-                configuration.getDefaultName()
+                configuration.getDefaultName(),
+                serviceStatusCache
         );
         environment.jersey().register(resource);
+
+        HealthChecker healthChecker = new HealthChecker(serviceStatusCache);
+        environment.lifecycle().manage(healthChecker);
+
     }
 
 }

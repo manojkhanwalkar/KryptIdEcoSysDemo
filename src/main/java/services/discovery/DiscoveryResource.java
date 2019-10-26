@@ -34,10 +34,11 @@ public class DiscoveryResource {
 
     private final ServiceStatusCache serviceStatusCache;
 
-    public DiscoveryResource(String template, String defaultName) {
+    public DiscoveryResource(String template, String defaultName, ServiceStatusCache serviceStatusCache) {
         this.template = template;
         this.defaultName = defaultName;
-        serviceStatusCache = new ServiceStatusCache();
+
+        this.serviceStatusCache=serviceStatusCache;
 
     }
 
