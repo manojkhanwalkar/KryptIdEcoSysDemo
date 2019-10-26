@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class ServiceStatus implements Cloneable{
 
-    public void add(String url, String healthUrl) {
+    public synchronized void add(String url, String healthUrl) {
 
         ServiceStatusHealthCheckTuple serviceStatusHealthCheckTuple = new ServiceStatusHealthCheckTuple();
         serviceStatusHealthCheckTuple.setHealthCheckURL(healthUrl);
@@ -23,12 +23,12 @@ public class ServiceStatus implements Cloneable{
 
     }
 
-    public void remove(String url) {
+    public synchronized void remove(String url) {
 
         servicesStatus.remove(url);
     }
 
-    public void updateStatus(String url, Status status)
+    public synchronized void updateStatus(String url, Status status)
     {
         ServiceStatusHealthCheckTuple serviceStatusHealthCheckTuple = servicesStatus.get(url);
         serviceStatusHealthCheckTuple.setServiceStatus(status);

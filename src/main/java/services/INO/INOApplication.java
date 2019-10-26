@@ -5,6 +5,7 @@ import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import services.client.DiscoveryClient;
+import util.AppHealthCheck;
 import util.DiscoveryLifeCycle;
 
 
@@ -41,6 +42,7 @@ public class INOApplication extends Application<INOConfiguration> {
         DiscoveryLifeCycle myManagedObject = new DiscoveryLifeCycle(Constants.INOServiceUrl,Constants.INOServiceType, Constants.INOServiceHealthUrl);
         environment.lifecycle().manage(myManagedObject);
         environment.jersey().register(resource);
+        environment.healthChecks().register("APIHealthCheck", new AppHealthCheck());
 
 
     }

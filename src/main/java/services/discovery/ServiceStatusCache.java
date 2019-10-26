@@ -5,7 +5,9 @@ import services.discovery.data.ServiceStatus;
 import services.discovery.data.ServiceStatusInfo;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ServiceStatusCache {
 
@@ -55,6 +57,12 @@ public class ServiceStatusCache {
 
     }
 
+
+    protected List<ServiceStatus> getServices()
+    {
+        List<ServiceStatus> services = serviceStatusMap.entrySet().stream().map(entry->entry.getValue()).collect(Collectors.toList());
+        return services;
+    }
 
 
 
