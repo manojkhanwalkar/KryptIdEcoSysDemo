@@ -36,7 +36,7 @@ public class ServiceStatus implements Cloneable{
  /*   @JsonProperty
     String serviceType; */
 
-    public Map<String,ServiceStatusHealthCheckTuple> serviceInstanceStatus = new HashMap<>();
+    public HashMap<String,ServiceStatusHealthCheckTuple> serviceInstanceStatus = new HashMap<>();
 
 
   /*  public String getServiceType() {

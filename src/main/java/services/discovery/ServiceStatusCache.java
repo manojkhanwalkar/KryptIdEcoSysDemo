@@ -3,18 +3,30 @@ package services.discovery;
 import services.discovery.data.ServiceInfo;
 import services.discovery.data.ServiceStatus;
 import services.discovery.data.ServiceStatusInfo;
+import util.JSONUtil;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class ServiceStatusCache {
 
 
+    List<CacheObserver> observers = new CopyOnWriteArrayList<>();
 
 
-    Map<String, ServiceStatus>  serviceStatusMap = new HashMap<>();
+    public void addObserver(CacheObserver cacheObserver)
+    {
+        observers.add(cacheObserver);
+    }
+
+    HashMap<String, ServiceStatus>  serviceStatusMap = new HashMap<>();
+
+
+    private void updateObservers(String str)
+    {
+        observers.stream().forEach(observer-> observer.notify(str));
+    }
 
     public synchronized void register(ServiceInfo serviceInfo)
     {
@@ -29,6 +41,8 @@ public class ServiceStatusCache {
 
         serviceStatus.add(serviceInfo.getUrl(),serviceInfo.getHealthCheckUrl());
 
+        updateObservers("Registered service " + JSONUtil.toJSON(serviceInfo));
+
 
     }
 
@@ -41,8 +55,14 @@ public class ServiceStatusCache {
 
         }
 
+        updateObservers("De-registered service " + JSONUtil.toJSON(serviceInfo));
+
+    }
 
 
+    public synchronized HashMap<String, ServiceStatus> getServiceStatusMap()
+    {
+        return serviceStatusMap;
     }
 
     public synchronized ServiceStatusInfo getStatus(String serviceType)

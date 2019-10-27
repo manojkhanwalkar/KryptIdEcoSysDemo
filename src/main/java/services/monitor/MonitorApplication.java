@@ -30,6 +30,8 @@ public class MonitorApplication extends Application<MonitorConfiguration> {
                 configuration.getTemplate(),
                 configuration.getDefaultName()
         );
+
+        environment.lifecycle().manage(new ServiceWatcher());
         environment.jersey().register(resource);
     }
 

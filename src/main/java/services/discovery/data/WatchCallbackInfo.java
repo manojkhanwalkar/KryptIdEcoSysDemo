@@ -1,33 +1,30 @@
 package services.discovery.data;
 
+import com.amazonaws.services.kinesis.model.HashKeyRange;
+import com.amazonaws.services.medialive.model.HlsAkamaiHttpTransferMode;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.HashMap;
 
 public class WatchCallbackInfo {
 
-    //TODO - define information to be sent to a watch client .
 
+    HashMap<String,ServiceStatus>  serviceStatusSnapShot ;
 
-    @JsonProperty
-String serviceType;
-
-
-    public String getServiceType() {
-        return serviceType;
+    public HashMap<String, ServiceStatus> getServiceStatusSnapShot() {
+        return serviceStatusSnapShot;
     }
 
-    public void setServiceType(String serviceType) {
-        this.serviceType = serviceType;
+    public void setServiceStatusSnapShot(HashMap<String, ServiceStatus> serviceStatusSnapShot) {
+        this.serviceStatusSnapShot = serviceStatusSnapShot;
     }
 
-    @JsonProperty
-    String callbackURL;
 
-    public String getCallbackURL() {
-        return callbackURL;
-    }
-
-    public void setCallbackURL(String callbackURL) {
-        this.callbackURL = callbackURL;
+    @Override
+    public String toString() {
+        return "WatchCallbackInfo{" +
+                "serviceStatusSnapShot=" + serviceStatusSnapShot +
+                '}';
     }
 }
 

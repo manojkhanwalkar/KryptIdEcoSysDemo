@@ -2,10 +2,7 @@ package services.client;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import constants.Constants;
-import services.discovery.data.ServiceInfo;
-import services.discovery.data.ServiceStatus;
-import services.discovery.data.ServiceStatusInfo;
-import services.discovery.data.WatchInfo;
+import services.discovery.data.*;
 import util.JSONUtil;
 
 import java.util.HashMap;
@@ -67,10 +64,10 @@ public class DiscoveryClient {
 
     }
 
-    public ServiceStatusInfo watch(String serviceType , String callbackURL) throws Exception
+    public WatchCallbackInfo watch( String callbackURL) throws Exception
     {
         WatchInfo watchInfo= new WatchInfo();
-        watchInfo.setServiceType(serviceType);
+      //  watchInfo.setServiceType(serviceType);
         watchInfo.setCallbackURL(callbackURL);
 
 
@@ -79,7 +76,7 @@ public class DiscoveryClient {
 
         System.out.println(response);
 
-        return (ServiceStatusInfo) JSONUtil.fromJSON(response,ServiceStatusInfo.class);
+        return (WatchCallbackInfo) JSONUtil.fromJSON(response, WatchCallbackInfo.class);
 
 
     }
@@ -104,7 +101,7 @@ public class DiscoveryClient {
 
         verifier.service("INO");
 
-        verifier.watch("INO","TO BE IMPLEMENTED");
+       // verifier.watch("INO","TO BE IMPLEMENTED");
 
         verifier.deregister(Constants.INOServiceUrl,"INO");
 

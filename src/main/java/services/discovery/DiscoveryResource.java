@@ -2,10 +2,7 @@ package services.discovery;
 
 import com.codahale.metrics.annotation.Timed;
 import data.*;
-import services.discovery.data.ServiceInfo;
-import services.discovery.data.ServiceStatus;
-import services.discovery.data.ServiceStatusInfo;
-import services.discovery.data.WatchInfo;
+import services.discovery.data.*;
 import util.CryptUtil;
 import util.JSONUtil;
 import util.KeyExchangeManager;
@@ -47,12 +44,16 @@ public class DiscoveryResource {
     @Timed
     @Path("/watch")
     @Produces(MediaType.APPLICATION_JSON)
-    public ServiceStatusInfo watch(WatchInfo watchInfo) {
+    public WatchCallbackInfo watch(WatchInfo watchInfo) {
 
-        //TODO - add watch features
-        ServiceStatusInfo serviceStatusInfo = serviceStatusCache.getStatus(watchInfo.getServiceType()) ;
-        serviceStatusInfo.setServiceType(watchInfo.getServiceType());
-        return serviceStatusInfo;
+        WatchCallbackInfo watchCallbackInfo =  new WatchCallbackInfo();
+        watchCallbackInfo.setServiceStatusSnapShot(serviceStatusCache.getServiceStatusMap());
+
+        WatchUpdater updater = new WatchUpdater(watchInfo);
+        serviceStatusCache.addObserver(updater);
+
+        return watchCallbackInfo;
+
 
 
     }

@@ -33,9 +33,9 @@ public class MonitorResource {
     @Timed
     @Path("/callback")
     @Produces(MediaType.APPLICATION_JSON)
-    public String watch(WatchInfo watchInfo) {
+    public String watch(String str) {
 
-        //TODO - discovery will call this
+        System.out.println(str);
 
 
         return "Received watch callback" ;

@@ -22,6 +22,8 @@ public class Constants {
     public static final String BureauServiceUrl = "https://172.17.0.1:8480/";
     public static final String BureauServiceHealthUrl = "https://172.17.0.1:8481/";
 
+    public static final String MonitorServiceUrl = "https://172.17.0.1:8680/";
+
 
     public static final String BureauServiceType = "Bureau";
 }
