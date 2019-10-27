@@ -23,7 +23,7 @@ public class DHUtil {
 
     String ALGO = "AES";
 
-    CertUtil  util = new CertUtil();
+    //CertUtil  util = new CertUtil();
 
 
     public DHUtil(PublicKey publicKey , PrivateKey privateKey) {

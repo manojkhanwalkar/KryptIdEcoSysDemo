@@ -10,6 +10,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.security.cert.X509Certificate;
+import java.util.Base64;
+
+import static util.CertUtil.getCertificate;
 
 
 @Path("/")
@@ -41,6 +45,30 @@ public class MonitorResource {
         return "Received watch callback" ;
 
     }
+
+
+
+    @POST
+    @Timed
+    @Path("/certtest")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String certtest(String str) {
+
+        byte[] bytes =  Base64.getDecoder().decode(str.getBytes());
+
+        X509Certificate certificate1 = getCertificate(bytes);
+
+        System.out.println(certificate1);
+
+
+       // System.out.println(str);
+
+
+        return "Received cert" ;
+
+    }
+
+
 
 
 

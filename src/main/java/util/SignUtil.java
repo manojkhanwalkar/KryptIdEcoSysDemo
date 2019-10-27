@@ -7,8 +7,7 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
-import static util.CertUtil.extractPublicKeyFromFile;
-import static util.CertUtil.loadPrivateKey;
+
 
 // using the same keys for signing and key exchange - in practice a separate set of keys will be used.
 

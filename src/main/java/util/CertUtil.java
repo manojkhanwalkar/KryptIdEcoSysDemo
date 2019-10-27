@@ -2,29 +2,33 @@ package util;
 
 import java.io.*;
 import java.security.*;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
+
+import static java.util.Base64.getDecoder;
+import static java.util.Base64.getEncoder;
 
 public class CertUtil {
 
 
-    private static final String ALGO = "SHA256withECDSA";
+  //  private static final String ALGO = "SHA256withECDSA";
 
 
-/*
-    public static PublicKey getPublicKey()
+
+    public static X509Certificate getCertificate(String certFile)
     {
         try {
             CertificateFactory fact = CertificateFactory.getInstance("X.509");
-            FileInputStream is = new FileInputStream("/home/manoj/IdeaProjects/securitytest/src/main/resources/certificate.pem");
+            FileInputStream is = new FileInputStream(certFile);
             X509Certificate cer = (X509Certificate) fact.generateCertificate(is);
-            PublicKey key = cer.getPublicKey();
 
 
             //System.out.println(cer);
-            return key;
+            return cer;
         } catch (CertificateException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
@@ -33,11 +37,31 @@ public class CertUtil {
 
         return null;
     }
-    */
 
 
 
-    public static byte[] extractPublicKeyFromFile(String fileName)
+    public static X509Certificate getCertificate(byte[] certBytes)
+    {
+        try {
+            CertificateFactory fact = CertificateFactory.getInstance("X.509");
+
+            ByteArrayInputStream bis = new ByteArrayInputStream(certBytes);
+
+            X509Certificate cer = (X509Certificate) fact.generateCertificate(bis);
+
+
+            //System.out.println(cer);
+            return cer;
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
+
+ /*   public static byte[] extractPublicKeyFromFile(String fileName)
     {
         try {
             File privKeyFile = new File(fileName);
@@ -101,12 +125,31 @@ public class CertUtil {
 
         return null;
     }
-
+*/
 
 
     public static void main(String[] args) throws Exception {
 
-       PublicKey pub =  getPublicKey(extractPublicKeyFromFile("/home/manoj/IdeaProjects/phoenix/src/main/resources/idpcertificate.pem"));
+
+        String certFile = "/home/manoj/IdeaProjects/securitytest/src/main/resources/certificate.pem";
+
+        X509Certificate certificate = getCertificate(certFile);
+
+        PublicKey key = certificate.getPublicKey();
+
+        String certStr = getEncoder().encodeToString(certificate.getEncoded());
+
+        byte[] bytes =  Base64.getDecoder().decode(certStr.getBytes());
+
+        X509Certificate certificate1 = getCertificate(bytes);
+
+        System.out.println(certificate1);
+
+
+
+
+
+     /*  PublicKey pub =  getPublicKey(extractPublicKeyFromFile("/home/manoj/IdeaProjects/phoenix/src/main/resources/idpcertificate.pem"));
         PrivateKey priv = loadPrivateKey("/home/manoj/IdeaProjects/phoenix/src/main/resources/idpprivatekey.der");
 
         String plainText = "Hello World from EC Public and Private keys";
@@ -124,7 +167,7 @@ public class CertUtil {
         boolean result = ecdsaVerify.verify(signature);
 
 
-        System.out.println(result);
+        System.out.println(result); */
 
 
 
