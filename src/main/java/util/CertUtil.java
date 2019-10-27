@@ -2,6 +2,7 @@ package util;
 
 import java.io.*;
 import java.security.*;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -56,6 +57,27 @@ public class CertUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String getCertAsString(X509Certificate certificate)
+    {
+        try {
+            String certStr = getEncoder().encodeToString(certificate.getEncoded());
+            return certStr;
+        } catch (CertificateEncodingException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+
+    public static X509Certificate getCertFromString(String certStr)
+    {
+        byte[] bytes =  Base64.getDecoder().decode(certStr.getBytes());
+
+        X509Certificate certificate = getCertificate(bytes);
+        return certificate;
     }
 
 

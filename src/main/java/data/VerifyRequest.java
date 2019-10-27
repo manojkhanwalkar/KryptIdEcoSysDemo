@@ -11,7 +11,7 @@ public class VerifyRequest {
     public String toString() {
         return "VerifyRequest{" +
                 "identity=" + identity +
-                ", rsaPublicKey='" + rsaPublicKey + '\'' +
+                ", rsaCert='" + rsaCert + '\'' +
                 '}';
     }
 
@@ -24,13 +24,13 @@ public class VerifyRequest {
         this.identity = identity;
     }
 
-    String rsaPublicKey;
+    String rsaCert;
 
-    public String getRsaPublicKey() {
-        return rsaPublicKey;
+    public String getRsaCert() {
+        return rsaCert;
     }
 
-    public void setRsaPublicKey(String rsaPublicKey) {
-        this.rsaPublicKey = rsaPublicKey;
+    public void setRsaCert(String rsaCert) {
+        this.rsaCert = rsaCert;
     }
 }

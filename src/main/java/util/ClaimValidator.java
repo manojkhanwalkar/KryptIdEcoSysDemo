@@ -40,6 +40,24 @@ public class ClaimValidator {
 
     }
 
+    public static EncryptedVerifiedClaim convert(VerifiedClaim verifiedClaim, PublicKey rsaPublicKey)
+    {
+        String claimStr = JSONUtil.toJSON(verifiedClaim);
+
+        EncryptedVerifiedClaim encryptedVerifiedClaim = new EncryptedVerifiedClaim();
+
+       // PublicKey rsaPublicKey = CryptUtil.convertStringtoPublicKey(rsaPublicKeyStr,"RSA");
+
+        SymKeyStringTuple tuple = CryptUtil.encrypt(claimStr,rsaPublicKey);
+
+        encryptedVerifiedClaim.setVerifiedClaim(tuple.message);
+        encryptedVerifiedClaim.setEncryptedKey(tuple.key);
+
+        return encryptedVerifiedClaim;
+
+    }
+
+
     public static EncryptedVerifiedClaim convert(VerifiedClaim verifiedClaim, String rsaPublicKeyStr)
     {
         String claimStr = JSONUtil.toJSON(verifiedClaim);

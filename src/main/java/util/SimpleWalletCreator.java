@@ -12,6 +12,7 @@ import data.SimpleWalletRecord;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class SimpleWalletCreator {
         SimpleWalletCreator wallet = new SimpleWalletCreator();
 
 
-       // wallet.insertKeys();
+      //  wallet.insertKeys();
 
         wallet.printKeys();
 
@@ -86,6 +87,7 @@ public class SimpleWalletCreator {
 
     PublicKey rsaPublicKey;
     PrivateKey rsaPrivateKey;
+    X509Certificate certificate;
 
     public SimpleWalletCreator()
     {
@@ -103,17 +105,21 @@ public class SimpleWalletCreator {
 
         rsaPublicKey = CryptUtil.getPublicKeyFromCertFile(rsaCertFile,"RSA");
         rsaPrivateKey = CryptUtil.getPrivateKeyDerFromFile(rsaPrivateFile,"RSA");
+        certificate = CertUtil.getCertificate(rsaCertFile);
 
         String privateKey = CryptUtil.convertPrivateKeyToString(rsaPrivateKey);
         String publicKey = CryptUtil.convertPublicKeyToString(rsaPublicKey);
+
+        String certStr = CertUtil.getCertAsString(certificate);
 
 
 
         SimpleWalletRecord simpleWalletRecord = new SimpleWalletRecord();
 
-        simpleWalletRecord.setId("1");
+        simpleWalletRecord.setId("2");
         simpleWalletRecord.setPrivateKey(privateKey);
         simpleWalletRecord.setPublicKey(publicKey);
+        simpleWalletRecord.setCertificate(certStr);
 
         mapper.save(simpleWalletRecord);
 

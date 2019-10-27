@@ -15,6 +15,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -40,6 +41,7 @@ public class ClientVerifier {
 
     PublicKey rsaPublicKey;
     PrivateKey rsaPrivateKey;
+    X509Certificate rsaCertificate ;
 
     Connection ino;
     Connection sp;
@@ -56,6 +58,8 @@ public class ClientVerifier {
 
         rsaPublicKey = wallet.getRsaPublicKey();
         rsaPrivateKey = wallet.getRsaPrivateKey();
+        rsaCertificate = wallet.getRsaCertificate();
+
 
       //    = CryptUtil.getPublicKeyFromCertFile(rsaCertFile,"RSA");
         //  = CryptUtil.getPrivateKeyDerFromFile(rsaPrivateFile,"RSA");
@@ -83,8 +87,10 @@ public class ClientVerifier {
 
 
 
+        request.setRsaCert(CertUtil.getCertAsString(rsaCertificate));
 
-        request.setRsaPublicKey(CryptUtil.convertPublicKeyToString(rsaPublicKey));
+
+        //request.setRsaPublicKey(CryptUtil.convertPublicKeyToString(rsaPublicKey));
 
         String str = JSONUtil.toJSON(request);
 

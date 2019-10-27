@@ -3,6 +3,7 @@ package services.INO;
 import com.codahale.metrics.annotation.Timed;
 import constants.Constants;
 import data.*;
+import org.eclipse.jetty.util.ssl.X509;
 import util.*;
 
 
@@ -12,6 +13,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -95,18 +97,13 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
 
         String transactionNumberStr = JSONUtil.toJSON(transactionNumber);
 
-   /*     String claimStr = JSONUtil.toJSON(claim);
 
-        EncryptedVerifiedClaim encryptedVerifiedClaim = new EncryptedVerifiedClaim();
 
-        PublicKey rsaPublicKey = CryptUtil.convertStringtoPublicKey(verifyRequest.getRsaPublicKey(),"RSA");
+        X509Certificate rsaCertificate = CertUtil.getCertFromString(verifyRequest.getRsaCert());
 
-        SymKeyStringTuple tuple = CryptUtil.encrypt(claimStr,rsaPublicKey);
+        PublicKey rsaPublicKey = rsaCertificate.getPublicKey();
 
-        encryptedVerifiedClaim.setVerifiedClaim(tuple.message);
-        encryptedVerifiedClaim.setEncryptedKey(tuple.key);*/
-
-        EncryptedVerifiedClaim encryptedVerifiedClaim = convert(claim,verifyRequest.getRsaPublicKey());
+        EncryptedVerifiedClaim encryptedVerifiedClaim = convert(claim,rsaPublicKey);
 
 
         claimCache.put(id,encryptedVerifiedClaim);

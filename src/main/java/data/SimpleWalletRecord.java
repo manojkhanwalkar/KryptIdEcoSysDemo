@@ -16,8 +16,17 @@ public class SimpleWalletRecord {
     private String publicKey;
     @DynamoDBAttribute(attributeName="privateKey")
     private String privateKey;
+    @DynamoDBAttribute(attributeName="certificate")
+    private String certificate;
 
 
+    public String getCertificate() {
+        return certificate;
+    }
+
+    public void setCertificate(String certificate) {
+        this.certificate = certificate;
+    }
 
     public String getId() {
         return id;
@@ -59,6 +68,7 @@ public class SimpleWalletRecord {
                 ", claimId='" + claimId + '\'' +
                 ", publicKey='" + publicKey + '\'' +
                 ", privateKey='" + privateKey + '\'' +
+                ", certificate='" + certificate + '\'' +
                 '}';
     }
 }

@@ -8,10 +8,12 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.model.*;
 import data.SimpleWalletRecord;
+import util.CertUtil;
 import util.CryptUtil;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +43,8 @@ public class SimpleWallet {
     PublicKey rsaPublicKey;
     PrivateKey rsaPrivateKey;
 
+    X509Certificate rsaCertificate;
+
     SimpleWalletRecord simpleWalletRecord;
 
     public SimpleWallet()
@@ -52,6 +56,9 @@ public class SimpleWallet {
 
         rsaPublicKey = CryptUtil.convertStringtoPublicKey(simpleWalletRecord.getPublicKey(),"RSA");
         rsaPrivateKey = CryptUtil.convertStringtoPrivateKey(simpleWalletRecord.getPrivateKey(),"RSA");
+
+        rsaCertificate = CertUtil.getCertFromString(simpleWalletRecord.getCertificate());
+
 
     }
 
@@ -75,6 +82,9 @@ public class SimpleWallet {
         return simpleWalletRecord.getClaimId();
     }
 
+    public X509Certificate getRsaCertificate() {
+        return rsaCertificate;
+    }
 
     public void updateClaimId(String claimId)
     {
