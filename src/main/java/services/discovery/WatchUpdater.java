@@ -4,6 +4,8 @@ import constants.Constants;
 import services.client.Connection;
 import services.discovery.data.WatchInfo;
 
+import java.util.concurrent.CompletableFuture;
+
 public class WatchUpdater implements CacheObserver {
 
     String callbackUrl ;
@@ -16,12 +18,16 @@ public class WatchUpdater implements CacheObserver {
     @Override
     public void notify(String str) {
 
-        //todo - make it as a completable future
+
+        CompletableFuture<Void> future = CompletableFuture.runAsync(()->{
+
         Connection connection = new Connection(Constants.MonitorServiceUrl);
         try {
             connection.sendSimple(str,"callback");
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        });
     }
 }
