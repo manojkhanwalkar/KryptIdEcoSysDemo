@@ -32,8 +32,9 @@ public class INOResource {
 
 PublicKey publicKey;
 PrivateKey privateKey;
+    X509Certificate certificate;
 
-KeyExchangeManager keyExchangeManager;
+    KeyExchangeManager keyExchangeManager;
 
 ClaimManager claimManager ;
 
@@ -46,8 +47,9 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
         this.counter = new AtomicLong();
 
        publicKey =  CryptUtil.getPublicKeyFromCertFile(certFile,"EC");
+        certificate = CertUtil.getCertificate(certFile);
        privateKey =  CryptUtil.getPrivateKeyDerFromFile(privateFile,"EC");
-       keyExchangeManager = new KeyExchangeManager(publicKey,privateKey);
+       keyExchangeManager = new KeyExchangeManager(publicKey,privateKey,certificate);
 
        claimManager = new ClaimManager();
     }

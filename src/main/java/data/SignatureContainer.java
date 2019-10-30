@@ -4,19 +4,30 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SignatureContainer {
 
-    String publicKey;
+  //  String publicKey;
     String signature;
     String algorithm;
 
+    String certStr;
 
-    @JsonProperty
+    public String getCertStr() {
+        return certStr;
+    }
+
+    public void setCertStr(String certStr) {
+        this.certStr = certStr;
+    }
+
+    /*   @JsonProperty
     public String getPublicKey() {
         return publicKey;
     }
 
     public void setPublicKey(String publicKey) {
         this.publicKey = publicKey;
-    }
+    }*/
+
+
 
     @JsonProperty
     public String getSignature() {

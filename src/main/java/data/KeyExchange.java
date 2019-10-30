@@ -4,7 +4,7 @@ public class KeyExchange {
 
 
 
-    String publicKey;
+   /* String publicKey;
 
     public String getPublicKey() {
         return publicKey;
@@ -12,8 +12,17 @@ public class KeyExchange {
 
     public void setPublicKey(String publicKey) {
         this.publicKey = publicKey;
+    }*/
+
+   String certStr;
+
+    public String getCertStr() {
+        return certStr;
     }
 
+    public void setCertStr(String certStr) {
+        this.certStr = certStr;
+    }
 
     String clientId;
 

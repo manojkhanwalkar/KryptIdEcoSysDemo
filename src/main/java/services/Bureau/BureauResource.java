@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -34,6 +35,7 @@ public class BureauResource {
 
     PublicKey publicKey;
     PrivateKey privateKey;
+    X509Certificate certificate;
 
     KeyExchangeManager keyExchangeManager;
 
@@ -48,8 +50,9 @@ public class BureauResource {
 
 
         publicKey =  CryptUtil.getPublicKeyFromCertFile(certFile,"EC");
+        certificate = CertUtil.getCertificate(certFile);
         privateKey =  CryptUtil.getPrivateKeyDerFromFile(privateFile,"EC");
-        keyExchangeManager = new KeyExchangeManager(publicKey,privateKey);
+        keyExchangeManager = new KeyExchangeManager(publicKey,privateKey,certificate);
 
         rsaKeyHolder = new RSAKeyHolder(rsaCertFile,rsaPrivateFile);
     }

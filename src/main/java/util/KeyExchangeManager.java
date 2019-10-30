@@ -8,6 +8,7 @@ import data.SignatureContainer;
 
 import java.io.UnsupportedEncodingException;
 import java.security.*;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 
 public class KeyExchangeManager {
@@ -18,11 +19,13 @@ public class KeyExchangeManager {
 
     PublicKey publicKey;
     PrivateKey privateKey;
+    X509Certificate certificate;
 
-    public KeyExchangeManager(PublicKey publicKey, PrivateKey privateKey)
+    public KeyExchangeManager(PublicKey publicKey, PrivateKey privateKey, X509Certificate certificate)
     {
         this.privateKey = privateKey;
         this.publicKey = publicKey;
+        this.certificate = certificate;
     }
 
 
@@ -36,9 +39,12 @@ public class KeyExchangeManager {
 
 
     public KeyExchange processExchange(KeyExchange request) {
-        String responseKey = request.getPublicKey();
+      //  String responseKey = request.getPublicKey();
 
-        PublicKey pubKey = CryptUtil.convertStringtoPublicKey(responseKey,"EC");
+        //PublicKey pubKey = CryptUtil.convertStringtoPublicKey(responseKey,"EC");
+
+        String responseCertStr = request.getCertStr();
+        PublicKey pubKey = CertUtil.getCertFromString(responseCertStr).getPublicKey();
 
         util = new DHUtil(publicKey,privateKey);
 
@@ -46,17 +52,19 @@ public class KeyExchangeManager {
 
 
         KeyExchange exchange = new KeyExchange();
-        String encKey = CryptUtil.convertPublicKeyToString(publicKey);
+      //  String encKey = CryptUtil.convertPublicKeyToString(publicKey);
 
+        String certStr = CertUtil.getCertAsString(certificate);
+        exchange.setCertStr(certStr);
 
-        exchange.setPublicKey(encKey);
+       // exchange.setPublicKey(encKey);
 
         sessionKeyCache.put(request.getClientId(),util);
 
 
-        digiSig = new SignUtil(publicKey,privateKey);
+        digiSig = new SignUtil(publicKey,privateKey,certificate);
 
-        verifySig = new SignUtil(publicKey,privateKey);
+        verifySig = new SignUtil(publicKey,privateKey,certificate);
         return exchange;
 
     }

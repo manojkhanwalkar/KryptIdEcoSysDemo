@@ -14,6 +14,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static util.ClaimValidator.convert;
@@ -39,6 +40,7 @@ public class SPResource {
 
     private PublicKey publicKey;
     private PrivateKey privateKey;
+    X509Certificate certificate;
 
     private KeyExchangeManager keyExchangeManager;
 
@@ -54,8 +56,10 @@ public class SPResource {
         this.counter = new AtomicLong();
 
         publicKey =  CryptUtil.getPublicKeyFromCertFile(certFile,"EC");
+
         privateKey =  CryptUtil.getPrivateKeyDerFromFile(privateFile,"EC");
-        keyExchangeManager = new KeyExchangeManager(publicKey,privateKey);
+        certificate = CertUtil.getCertificate(certFile);
+        keyExchangeManager = new KeyExchangeManager(publicKey,privateKey,certificate);
 
         rsaKeyHolder = new RSAKeyHolder(rsaCertFile,rsaPrivateFile);
 
@@ -128,7 +132,7 @@ public class SPResource {
 
 
 
-            bureau = new Connection(bureauURL,publicKey,privateKey);
+            bureau = new Connection(bureauURL,publicKey,privateKey,certificate);
 
             bureau.connect();
 

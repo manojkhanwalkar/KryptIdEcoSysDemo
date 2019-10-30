@@ -3,10 +3,7 @@ package services.client;
 import data.EncryptedMessage;
 import data.KeyExchange;
 import data.SignatureContainer;
-import util.CryptUtil;
-import util.DHUtil;
-import util.JSONUtil;
-import util.SignUtil;
+import util.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -14,6 +11,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.*;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.time.Duration;
 import java.util.Properties;
@@ -31,6 +29,8 @@ public class Connection {
 
     PrivateKey privateKey;
 
+    X509Certificate certificate;
+
     String clientId = UUID.randomUUID().toString();
 
     SignUtil digiSig ;
@@ -38,11 +38,12 @@ public class Connection {
     SignUtil verifySig;
 
 
-    public Connection(String target, PublicKey publicKey , PrivateKey privateKey)
+    public Connection(String target, PublicKey publicKey , PrivateKey privateKey, X509Certificate certificate)
     {
         this.target = target;
         this.privateKey= privateKey;
         this.publicKey = publicKey;
+        this.certificate = certificate;
 
         initConnectionProps();
 
@@ -50,9 +51,9 @@ public class Connection {
 
         util = new DHUtil(publicKey,privateKey);
 
-         digiSig= new SignUtil(publicKey, privateKey);
+         digiSig= new SignUtil(publicKey, privateKey,certificate);
 
-        verifySig= new SignUtil(publicKey, privateKey);
+        verifySig= new SignUtil(publicKey, privateKey,certificate);
 
     }
 
@@ -198,10 +199,14 @@ public class Connection {
 
 
         KeyExchange exchange = new KeyExchange();
-        String encKey = CryptUtil.convertPublicKeyToString(publicKey);
+     //   String encKey = CryptUtil.convertPublicKeyToString(publicKey);
+
+        String certStr = CertUtil.getCertAsString(certificate);
 
 
-        exchange.setPublicKey(encKey);
+       // exchange.setPublicKey(encKey);
+
+        exchange.setCertStr(certStr);
 
         exchange.setClientId(clientId);
 
@@ -213,10 +218,14 @@ public class Connection {
 
         KeyExchange results = (KeyExchange) JSONUtil.fromJSON(response,KeyExchange.class);
 
+        String responseCertStr = results.getCertStr();
 
-        String responseKey = results.getPublicKey();
+        PublicKey pubKey = CertUtil.getCertFromString(responseCertStr).getPublicKey();
 
-        PublicKey pubKey = CryptUtil.convertStringtoPublicKey(responseKey,"EC");
+
+//        String responseKey = results.getPublicKey();
+
+  //      PublicKey pubKey = CryptUtil.convertStringtoPublicKey(responseKey,"EC");
 
 
 

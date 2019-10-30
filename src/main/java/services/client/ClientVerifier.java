@@ -34,6 +34,7 @@ public class ClientVerifier {
 
     PublicKey publicKey;
     PrivateKey privateKey;
+    X509Certificate certificate;
 
 
    // String rsaCertFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/userrsacertificate.pem";
@@ -54,6 +55,7 @@ public class ClientVerifier {
 
          publicKey = CryptUtil.getPublicKeyFromCertFile(certFile,"EC");
          privateKey = CryptUtil.getPrivateKeyDerFromFile(privateFile,"EC");
+         certificate = CertUtil.getCertificate(certFile);
 
 
         rsaPublicKey = wallet.getRsaPublicKey();
@@ -64,8 +66,8 @@ public class ClientVerifier {
       //    = CryptUtil.getPublicKeyFromCertFile(rsaCertFile,"RSA");
         //  = CryptUtil.getPrivateKeyDerFromFile(rsaPrivateFile,"RSA");
 
-         ino = new Connection(inoURL,publicKey,privateKey);
-        sp = new Connection(spURL,publicKey,privateKey);
+         ino = new Connection(inoURL,publicKey,privateKey,certificate);
+        sp = new Connection(spURL,publicKey,privateKey,certificate);
 
         init();
 

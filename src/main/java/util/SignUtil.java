@@ -4,6 +4,7 @@ import data.SignatureContainer;
 
 import java.io.UnsupportedEncodingException;
 import java.security.*;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
@@ -21,15 +22,20 @@ public class SignUtil {
 
     private final PrivateKey privateKey;
 
-    private final String publicKeyStr ;
+    //private final String publicKeyStr ;
+
+    private final String certStr ;
 
 
-    public SignUtil(PublicKey publicKey, PrivateKey  privateKey)
+
+
+    public SignUtil(PublicKey publicKey, PrivateKey  privateKey, X509Certificate certificate)
     {
 
         this.privateKey = privateKey;
-        publicKeyStr= CryptUtil.convertPublicKeyToString(publicKey);
+       // publicKeyStr= CryptUtil.convertPublicKeyToString(publicKey);
 
+        this.certStr = CertUtil.getCertAsString(certificate);
 
     }
 
@@ -56,7 +62,8 @@ public class SignUtil {
 
         SignatureContainer signatureContainer = new SignatureContainer();
         signatureContainer.setAlgorithm(ALGO);
-        signatureContainer.setPublicKey(publicKeyStr);
+     //   signatureContainer.setPublicKey(publicKeyStr);
+        signatureContainer.setCertStr(certStr);
         signatureContainer.setSignature(sig);
 
 
@@ -74,7 +81,9 @@ public class SignUtil {
        // KeyFactory keyFactory = KeyFactory.getInstance("EC");
         PublicKey publicKey = keyFactory.generatePublic(publicKeySpec); */
 
-        PublicKey publicKey = CryptUtil.convertStringtoPublicKey(signatureContainer.getPublicKey(),"EC");
+    //    PublicKey publicKey = CryptUtil.convertStringtoPublicKey(signatureContainer.getPublicKey(),"EC");
+
+        PublicKey publicKey = CertUtil.getCertFromString(signatureContainer.getCertStr()).getPublicKey();
 
         ecdsaVerify.initVerify(publicKey);
         ecdsaVerify.update(message.getBytes("UTF-8"));
