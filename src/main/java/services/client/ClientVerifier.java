@@ -198,7 +198,7 @@ public class ClientVerifier {
         System.out.println("############## Service provider cert is " +  result);
 
 
-        //TODO - validate the cert received from service provider
+
 
         PublicKey publicKey = CertUtil.getCertFromString(certStr).getPublicKey();
 
