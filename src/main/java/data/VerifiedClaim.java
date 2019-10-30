@@ -26,7 +26,7 @@ public class VerifiedClaim {
 
     String signature;
 
-    String publicKey;
+   // String publicKey;
 
     public String getSignature() {
         return signature;
@@ -36,14 +36,23 @@ public class VerifiedClaim {
         this.signature = signature;
     }
 
-    public String getPublicKey() {
+   /* public String getPublicKey() {
         return publicKey;
     }
 
     public void setPublicKey(String publicKey) {
         this.publicKey = publicKey;
+    }*/
+
+   String certStr;
+
+    public String getCertStr() {
+        return certStr;
     }
 
+    public void setCertStr(String certStr) {
+        this.certStr = certStr;
+    }
 
     public String getValidUntil() {
         return validUntil;
@@ -57,11 +66,11 @@ public class VerifiedClaim {
     public String toString() {
         return "VerifiedClaim{" +
                 "tree=" + tree +
+                ", validUntil='" + validUntil + '\'' +
                 ", signature='" + signature + '\'' +
-                ", publicKey='" + publicKey + '\'' +
+                ", certStr='" + certStr + '\'' +
                 '}';
     }
-
 
     /*
 

@@ -222,7 +222,7 @@ public class ClientVerifier {
        // verifier.exchangeKeys();
 
         TransactionNumber transactionNumber;
-        String claimId = verifier.wallet.getClaimId();
+       String claimId = verifier.wallet.getClaimId();
 
         if (claimId==null) {
             VerifyRequest request = makeSampleRequest();
@@ -245,7 +245,7 @@ public class ClientVerifier {
             transactionNumber = verifier.verify(request);
             claim = verifier.getClaim(transactionNumber);
 
-        }
+     }
         else
         {
             System.out.println("Claim is valid ");

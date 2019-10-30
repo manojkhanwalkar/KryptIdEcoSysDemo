@@ -5,6 +5,7 @@ import data.VerifiedClaim;
 import data.VerifyRequest;
 import shareablemerkletree.AttributeNode;
 import shareablemerkletree.MerkleTree;
+import util.CertUtil;
 import util.CryptUtil;
 import util.MerkleTreeUtil;
 import util.VerifiedClaimSignUtil;
@@ -12,6 +13,7 @@ import util.VerifiedClaimSignUtil;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 public abstract class INOMock {
@@ -30,8 +32,9 @@ public abstract class INOMock {
 
         PrivateKey privateKey = CryptUtil.getPrivateKeyDerFromFile(privateFile,"EC");
         PublicKey publicKey = CryptUtil.getPublicKeyFromCertFile(certFile,"EC");
+        X509Certificate cert = CertUtil.getCertificate(certFile);
 
-        verifiedClaimSignUtil =new VerifiedClaimSignUtil(publicKey,privateKey);
+        verifiedClaimSignUtil =new VerifiedClaimSignUtil(publicKey,privateKey,cert);
 
     }
 
@@ -54,9 +57,9 @@ public abstract class INOMock {
 
         verifiedClaim.setSignature(signature);
 
-        String publicKeyStr = CryptUtil.convertPublicKeyToString(verifiedClaimSignUtil.getPublicKey());
+       // String publicKeyStr = CryptUtil.convertPublicKeyToString(verifiedClaimSignUtil.getPublicKey());
 
-        verifiedClaim.setPublicKey(publicKeyStr);
+        verifiedClaim.setCertStr(CertUtil.getCertAsString(verifiedClaimSignUtil.getCert()));
 
         return verifiedClaim;
 

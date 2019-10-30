@@ -13,7 +13,7 @@ public class ClaimValidator {
 
         boolean verify ;
 
-        VerifiedClaimSignUtil signUtil = new VerifiedClaimSignUtil(claim.getPublicKey());
+        VerifiedClaimSignUtil signUtil = new VerifiedClaimSignUtil(claim.getCertStr());
 
         verify = MerkleTreeUtil.validateTree(claim.getTree());
 
@@ -32,6 +32,9 @@ public class ClaimValidator {
         String encclaimStr = encryptedVerifiedClaim.getVerifiedClaim();
         String key = encryptedVerifiedClaim.getEncryptedKey();
         String claimStr = CryptUtil.decrypt(encclaimStr,key,rsaPrivateKey);
+
+        System.out.println("DEBUG");
+        System.out.println(claimStr);
 
         VerifiedClaim claim = (VerifiedClaim) JSONUtil.fromJSON(claimStr,VerifiedClaim.class);
 

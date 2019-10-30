@@ -2,6 +2,7 @@ package util;
 
 import java.io.UnsupportedEncodingException;
 import java.security.*;
+import java.security.cert.X509Certificate;
 import java.util.Base64;
 
 
@@ -19,20 +20,41 @@ public class VerifiedClaimSignUtil {
 
     private final PublicKey publicKey ;
 
+    private final X509Certificate cert;
 
-    public VerifiedClaimSignUtil(PublicKey publicKey , PrivateKey privateKey)
+
+    public VerifiedClaimSignUtil(PublicKey publicKey , PrivateKey privateKey, X509Certificate cert)
     {
         this.publicKey = publicKey;
         this.privateKey = privateKey;
+        this.cert = cert;
 
     }
 
-    public VerifiedClaimSignUtil(String publicKeyStr)
+    public X509Certificate getCert()
+    {
+        return cert;
+    }
+
+/*    public VerifiedClaimSignUtil(String publicKeyStr)
     {
         this.publicKey = CryptUtil.convertStringtoPublicKey(publicKeyStr,"EC");
 
         privateKey=null;
+    }*/
+
+
+    public VerifiedClaimSignUtil(String certStr)
+    {
+        this.cert = CertUtil.getCertFromString(certStr);
+       // this.publicKey = CryptUtil.convertStringtoPublicKey(publicKeyStr,"EC");
+
+        this.publicKey = cert.getPublicKey();
+
+        privateKey=null;
     }
+
+
 
 
 public PublicKey getPublicKey()
