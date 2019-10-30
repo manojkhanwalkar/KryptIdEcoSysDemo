@@ -8,7 +8,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 public class ClaimRecord {
 
     private String claimId;
-    private String encryptedVerifiedClaimStr;
+    private String doubleEncryptedVerifiedClaimStr;
+    private String encryptedKey;
 
 
     @DynamoDBHashKey(attributeName = "ClaimId")
@@ -23,22 +24,36 @@ public class ClaimRecord {
 
 
 
-    @DynamoDBAttribute(attributeName="EncryptedVerifiedClaim")
+    @DynamoDBAttribute(attributeName="DoubleEncryptedVerifiedClaim")
 
-    public String getEncryptedVerifiedClaimStr() {
-        return encryptedVerifiedClaimStr;
+    public String getDoubleEncryptedVerifiedClaimStr() {
+        return doubleEncryptedVerifiedClaimStr;
     }
 
-    public void setEncryptedVerifiedClaimStr(String encryptedVerifiedClaimStr) {
-        this.encryptedVerifiedClaimStr = encryptedVerifiedClaimStr;
+    public void setDoubleEncryptedVerifiedClaimStr(String encryptedVerifiedClaimStr) {
+        this.doubleEncryptedVerifiedClaimStr = encryptedVerifiedClaimStr;
     }
+
+
+    @DynamoDBAttribute(attributeName="EncryptedKey")
+    public String getEncryptedKey() {
+        return encryptedKey;
+    }
+
+    public void setEncryptedKey(String encryptedKey) {
+        this.encryptedKey = encryptedKey;
+    }
+
+
+
+
 
 
     @Override
     public String toString() {
         return "ClaimRecord{" +
                 "claimId='" + claimId + '\'' +
-                ", encryptedVerifiedClaimStr='" + encryptedVerifiedClaimStr + '\'' +
+                ", DoubleEncryptedVerifiedClaimStr='" + doubleEncryptedVerifiedClaimStr + '\'' +
                 '}';
     }
 }

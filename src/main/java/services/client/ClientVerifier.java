@@ -241,7 +241,7 @@ public class ClientVerifier {
 
        // verifier.exchangeKeys();
 
-        TransactionNumber transactionNumber;
+    /*    TransactionNumber transactionNumber;
        String claimId = verifier.wallet.getClaimId();
 
         if (claimId==null) {
@@ -271,7 +271,17 @@ public class ClientVerifier {
             System.out.println("Claim is valid ");
         }
 
-       verifier.transact(claim);
+       verifier.transact(claim); */
+
+        TransactionNumber transactionNumber;
+            VerifyRequest request = makeSampleRequest();
+            transactionNumber = verifier.verify(request);
+        VerifiedClaim  claim = verifier.getClaim(transactionNumber);
+
+        verifier.transact(claim);
+
+
+
 
     }
 

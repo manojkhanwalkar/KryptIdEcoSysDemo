@@ -10,8 +10,14 @@ import data.ClaimRecord;
 import data.EncryptedVerifiedClaim;
 import data.Identity;
 import data.VerifyRequest;
+import util.CertUtil;
+import util.CryptUtil;
 import util.JSONUtil;
+import util.SymKeyStringTuple;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +26,18 @@ import java.util.stream.Collectors;
 
 public class DynamoDBPersistenceManagerForClaims {
 
+
+    String certFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/dbrsacertificate.pem";
+    String privateFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/dbrsakey.der";
+
+
+
     AmazonDynamoDB ddb;
 
+
+    PublicKey publicKey;
+    PrivateKey privateKey;
+    X509Certificate certificate;
 
     static AmazonDynamoDB getHandle()
     {
@@ -35,10 +51,15 @@ public class DynamoDBPersistenceManagerForClaims {
 
     DynamoDBMapper mapper;
 
+
+
     public DynamoDBPersistenceManagerForClaims()
     {
         ddb = getHandle();
         mapper = new DynamoDBMapper(ddb);
+        publicKey =  CryptUtil.getPublicKeyFromCertFile(certFile,"RSA");
+        certificate = CertUtil.getCertificate(certFile);
+        privateKey =  CryptUtil.getPrivateKeyDerFromFile(privateFile,"RSA");
 
     }
 
@@ -49,7 +70,11 @@ public class DynamoDBPersistenceManagerForClaims {
 
         ClaimRecord claim = new ClaimRecord();
         claim.setClaimId(claimId);
-        claim.setEncryptedVerifiedClaimStr(JSONUtil.toJSON(encryptedVerifiedClaim));
+
+        String str = JSONUtil.toJSON(encryptedVerifiedClaim);
+        SymKeyStringTuple tuple = CryptUtil.encrypt(str,publicKey);
+        claim.setDoubleEncryptedVerifiedClaimStr(tuple.message);
+        claim.setEncryptedKey(tuple.key);
 
         mapper.save(claim);
 
@@ -68,7 +93,10 @@ public class DynamoDBPersistenceManagerForClaims {
 
             ClaimRecord claim = mapper.load(ClaimRecord.class, claimId);
 
-            String claimStr =  claim.getEncryptedVerifiedClaimStr();
+            String doubleEncryptedclaimStr =  claim.getDoubleEncryptedVerifiedClaimStr();
+            String encryptedKey = claim.getEncryptedKey();
+
+            String claimStr = CryptUtil.decrypt(doubleEncryptedclaimStr,encryptedKey,privateKey);
 
             EncryptedVerifiedClaim encryptedVerifiedClaim = (EncryptedVerifiedClaim)JSONUtil.fromJSON(claimStr,EncryptedVerifiedClaim.class);
 

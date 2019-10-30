@@ -47,9 +47,9 @@ public class ClaimTableCreator
     public static void main(String[] args) throws Exception {
 
 
-   //    createTable();
+       createTable();
 
-      printAllClaims();
+    //  printAllClaims();
 
        //seedIdentity();
 
