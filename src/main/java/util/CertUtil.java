@@ -14,7 +14,7 @@ import static java.util.Base64.getDecoder;
 import static java.util.Base64.getEncoder;
 
 //https://jamielinux.com/docs/openssl-certificate-authority/sign-server-and-client-certificates.html  - tutorial to generate root , intermediate and leaf certificates.
-
+// openssl pkcs8 -topk8 -inform PEM -outform DER -in private.pem -out private.der -nocrypt
 
 public class CertUtil {
 

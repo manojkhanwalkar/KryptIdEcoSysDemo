@@ -2,6 +2,7 @@ package util;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 
 public class RSAKeyHolder {
 
@@ -9,6 +10,8 @@ public class RSAKeyHolder {
     final PrivateKey privateKey;
     final String publicKeyStr ;
     final String privateKeyStr;
+    final X509Certificate certificate;
+    final String certString;
 
     public RSAKeyHolder(String certFile , String privateFile)
     {
@@ -16,7 +19,13 @@ public class RSAKeyHolder {
         privateKey = CryptUtil.getPrivateKeyDerFromFile(privateFile,"RSA");
         publicKeyStr = CryptUtil.convertPublicKeyToString(publicKey);
         privateKeyStr = CryptUtil.convertPrivateKeyToString(privateKey);
+        certificate = CertUtil.getCertificate(certFile);
+        certString = CertUtil.getCertAsString(certificate);
 
+    }
+
+    public String getCertString() {
+        return certString;
     }
 
     public PublicKey getPublicKey() {
@@ -36,12 +45,5 @@ public class RSAKeyHolder {
     }
 
 
-    public static void main(String[] args) {
 
-        String rsaCertFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/sprsacertificate.pem";
-        String rsaPrivateFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/sprsakey.der";
-
-        RSAKeyHolder    rsaKeyHolder = new RSAKeyHolder(rsaCertFile,rsaPrivateFile);
-
-    }
 }

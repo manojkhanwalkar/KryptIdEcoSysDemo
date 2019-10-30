@@ -32,8 +32,8 @@ public class SPResource {
     private String certFile = Constants.FileLocation+"KryptIdEcoSysDemo/src/main/resources/spcert.pem";
     private String privateFile = Constants.FileLocation+"KryptIdEcoSysDemo/src/main/resources/spkey.der";
 
-    private String rsaCertFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/sprsacertificate.pem";
-    private String rsaPrivateFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/sprsakey.der";
+    private String rsaCertFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/sprsacertificate1.pem";
+    private String rsaPrivateFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/sprsakey1.der";
 
 
  //   String bureauURL = "https://172.17.0.1:8480/";
@@ -90,7 +90,9 @@ public class SPResource {
     public String exchange() {
 
 
-            return rsaKeyHolder.getPublicKeyStr();
+         //   return rsaKeyHolder.getPublicKeyStr();
+
+        return rsaKeyHolder.getCertString();
 
     }
 

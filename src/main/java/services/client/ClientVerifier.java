@@ -29,6 +29,11 @@ import static util.ClaimValidator.isValidClaim;
 
 public class ClientVerifier {
 
+
+    String rootCertFile = "/home/manoj/ca/certs/ca.cert.pem";
+    String interCertFile = "/home/manoj/ca/intermediate/certs/intermediate.cert.pem";
+
+
     String certFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/clientcert.pem";
     String privateFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/clientkey.der";
 
@@ -49,6 +54,8 @@ public class ClientVerifier {
 
     SimpleWallet wallet = new SimpleWallet();
 
+    CertChainValidator certChainValidator ;
+
 
     public ClientVerifier(String inoURL, String spURL)
     {
@@ -68,6 +75,8 @@ public class ClientVerifier {
 
          ino = new Connection(inoURL,publicKey,privateKey,certificate);
         sp = new Connection(spURL,publicKey,privateKey,certificate);
+
+        certChainValidator = new CertChainValidator(rootCertFile,interCertFile);
 
         init();
 
@@ -180,13 +189,22 @@ public class ClientVerifier {
     public void transact(VerifiedClaim claim) throws Exception
     {
 
-        String spPublicKey = sp.get("claimkey");
+        String certStr = sp.get("claimkey");
 
-        System.out.println("Got public key from service provider " + spPublicKey);
+        System.out.println("Got public key cert from service provider " + certStr);
 
-        EncryptedVerifiedClaim encryptedVerifiedClaim = convert(claim,spPublicKey);
+        boolean result = certChainValidator.validate(certStr);
 
-        //TODO = got to encrypt the claim
+        System.out.println("############## Service provider cert is " +  result);
+
+
+        //TODO - validate the cert received from service provider
+
+        PublicKey publicKey = CertUtil.getCertFromString(certStr).getPublicKey();
+
+       // EncryptedVerifiedClaim encryptedVerifiedClaim = convert(claim,spPublicKey);
+
+        EncryptedVerifiedClaim encryptedVerifiedClaim = convert(claim,publicKey);
 
         //String claimStr = JSONUtil.toJSON(claim);
 

@@ -29,32 +29,6 @@ import java.util.Set;
 import static util.CertUtil.getCertificate;
 
 public class CertChainValidator {
-    /**
-     * Validate keychain
-     * @param client is the client X509Certificate
-     * @param keyStore containing all trusted certificate
-     * @return true if validation until root certificate success, false otherwise
-     * @throws KeyStoreException
-     * @throws CertificateException
-     * @throws InvalidAlgorithmParameterException
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchProviderException
-     */
-    public static boolean validateKeyChain(X509Certificate client,
-                                           KeyStore keyStore) throws KeyStoreException, CertificateException,
-            InvalidAlgorithmParameterException, NoSuchAlgorithmException,
-            NoSuchProviderException {
-        X509Certificate[] certs = new X509Certificate[keyStore.size()];
-        int i = 0;
-        Enumeration<String> alias = keyStore.aliases();
-
-        while (alias.hasMoreElements()) {
-            certs[i++] = (X509Certificate) keyStore.getCertificate(alias
-                    .nextElement());
-        }
-
-        return validateKeyChain(client, certs);
-    }
 
     /**
      * Validate keychain
@@ -66,7 +40,7 @@ public class CertChainValidator {
      * @throws NoSuchAlgorithmException
      * @throws NoSuchProviderException
      */
-    public static boolean validateKeyChain(X509Certificate client,
+    private static boolean validateKeyChain(X509Certificate client,
                                            X509Certificate... trustedCerts) throws CertificateException,
             InvalidAlgorithmParameterException, NoSuchAlgorithmException,
             NoSuchProviderException {
@@ -134,45 +108,43 @@ public class CertChainValidator {
         }
     }
 
+    X509Certificate rootCert;
+
+    X509Certificate interCert;
+
+    public CertChainValidator(String rootCertFile , String interCertFile)
+    {
+
+         rootCert = getCertificate(rootCertFile);
+
+         interCert = getCertificate(interCertFile);
+    }
+
+    public boolean validate(String leafCertStr)
+    {
+
+        X509Certificate leafCert = CertUtil.getCertFromString(leafCertStr);
+        try {
+            return validateKeyChain(leafCert,interCert,rootCert);
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+
+    }
+
     public static void main(String... args) throws KeyStoreException,
             NoSuchAlgorithmException, CertificateException, IOException,
             InvalidAlgorithmParameterException, NoSuchProviderException {
 
 
-  /*      String storename = "keystore.jks";
-
-        char[] storepass = "keystore".toCharArray();
-
-        KeyStore ks = KeyStore.getInstance("JKS");
-        FileInputStream fin = null;
-        try {
-            fin = new FileInputStream(storename);
-            ks.load(fin, storepass);
-            if (validateKeyChain(
-                    (X509Certificate) ks.getCertificate("clientint21int2"), ks)) {
-                System.out.println("validate success");
-            } else {
-                System.out.println("validate fail");
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            IOUtils.closeQuietly(fin);
-        } */
-
-
-        String rootCertFile = "/home/manoj/ca/certs/ca.cert.pem";
-
-        X509Certificate rootCert = getCertificate(rootCertFile);
-
-      //  System.out.println(rootCert);
-
-
-        String interCertFile = "/home/manoj/ca/intermediate/certs/intermediate.cert.pem";
-
-        X509Certificate interCert = getCertificate(interCertFile);
-
-        System.out.println(interCert);
 
         String leafCertFile = "/home/manoj/ca/intermediate/certs/www.example.com.cert.pem";
 
@@ -187,10 +159,9 @@ public class CertChainValidator {
 
        // System.out.println(certChainCert);
 
-        boolean validate = validateKeyChain(rootCert,rootCert);
 
 
-        System.out.println(validate);
+//        System.out.println(validate);
 
 
 
