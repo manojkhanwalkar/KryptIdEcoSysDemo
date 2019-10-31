@@ -166,6 +166,8 @@ public class SPResource {
             transactionStatus.setStatus(TransactionStatus.Status.Rejected);
         }
 
+        transactionStatus.setCreditScore(score);
+
 
         System.out.println(score);
 

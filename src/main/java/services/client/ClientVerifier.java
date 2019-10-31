@@ -147,6 +147,9 @@ public class ClientVerifier {
 
         isValidClaim(claim);
 
+
+
+
         System.out.println("claim after decrypting " + claim);
 
         Set<AttributeNode> nodes = new HashSet<>();
@@ -273,18 +276,20 @@ public class ClientVerifier {
 
        verifier.transact(claim); */
 
-        for (int i=0;i<32;i++) {
+    //    for (int i=0;i<32;i++) {
 
             TransactionNumber transactionNumber;
             VerifyRequest request = makeSampleRequest();
             transactionNumber = verifier.verify(request);
             VerifiedClaim claim = verifier.getClaim(transactionNumber);
 
+            System.out.println(JSONUtil.toPrettyJSON(claim));
+
             verifier.transact(claim);
 
 
             //Thread.sleep(2000);
-        }
+     //   }
 
 
 

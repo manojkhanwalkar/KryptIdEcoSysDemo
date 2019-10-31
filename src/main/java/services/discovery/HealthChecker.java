@@ -27,7 +27,7 @@ public class HealthChecker implements Managed {
 
         HealthTimerTask timerTask = new HealthTimerTask(serviceStatusCache);
 
-        ses.scheduleWithFixedDelay(timerTask,10,10, TimeUnit.SECONDS);
+        ses.scheduleWithFixedDelay(timerTask,10,10, TimeUnit.DAYS);
 
     }
 

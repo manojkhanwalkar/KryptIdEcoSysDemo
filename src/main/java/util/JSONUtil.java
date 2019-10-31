@@ -40,5 +40,16 @@ public class JSONUtil {
         return null;
     }
 
+    public static String toPrettyJSON(Object object)
+    {
+        try {
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 
 }

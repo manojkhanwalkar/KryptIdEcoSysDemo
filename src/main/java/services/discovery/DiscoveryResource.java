@@ -94,9 +94,11 @@ public class DiscoveryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String deregister(ServiceInfo serviceInfo) {
 
+        System.out.println("Deregister request " + serviceInfo);
+
         serviceStatusCache.deregister(serviceInfo);
 
-     return "Service has been deregistered" ;
+     return "Service has been de-registered" ;
 
 
     }
