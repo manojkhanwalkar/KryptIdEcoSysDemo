@@ -1,5 +1,7 @@
 package services.INO;
 
+import blockchain.TransactionBlockChainManager;
+import blockchain.TransactionManager;
 import constants.Constants;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
@@ -43,6 +45,9 @@ public class INOApplication extends Application<INOConfiguration> {
         environment.lifecycle().manage(myManagedObject);
         environment.jersey().register(resource);
         environment.healthChecks().register("APIHealthCheck", new AppHealthCheck());
+
+        TransactionBlockChainManager.getInstance().setPersistenceDir("/home/manoj/data/blockchain/request/");
+        TransactionBlockChainManager.getInstance().restore();
 
 
     }

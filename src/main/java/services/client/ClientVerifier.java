@@ -273,12 +273,18 @@ public class ClientVerifier {
 
        verifier.transact(claim); */
 
-        TransactionNumber transactionNumber;
+        for (int i=0;i<32;i++) {
+
+            TransactionNumber transactionNumber;
             VerifyRequest request = makeSampleRequest();
             transactionNumber = verifier.verify(request);
-        VerifiedClaim  claim = verifier.getClaim(transactionNumber);
+            VerifiedClaim claim = verifier.getClaim(transactionNumber);
 
-        verifier.transact(claim);
+            verifier.transact(claim);
+
+
+            //Thread.sleep(2000);
+        }
 
 
 

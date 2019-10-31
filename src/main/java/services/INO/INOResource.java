@@ -1,5 +1,7 @@
 package services.INO;
 
+import blockchain.LogManager;
+import blockchain.TransactionManager;
 import com.codahale.metrics.annotation.Timed;
 import constants.Constants;
 import data.*;
@@ -67,6 +69,7 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
     }
 
 
+    LogManager logManager = new LogManager();
 
     @POST
     @Timed
@@ -83,6 +86,9 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
 
         VerifyRequest verifyRequest = (VerifyRequest) JSONUtil.fromJSON(requestStr,VerifyRequest.class);
         System.out.println(verifyRequest);
+
+        logManager.submit(verifyRequest);
+
 
 
         VerifiedClaim claim = claimManager.verifyIdentityAndGenerateClaim(verifyRequest);
