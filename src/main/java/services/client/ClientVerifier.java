@@ -13,16 +13,18 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPublicKeySpec;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import static util.ClaimValidator.convert;
 import static util.ClaimValidator.isValidClaim;
@@ -46,7 +48,7 @@ public class ClientVerifier {
   //  String rsaPrivateFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/userrsakey.der";
 
     PublicKey rsaPublicKey;
-    PrivateKey rsaPrivateKey;
+    PrivateKey rsaPrivateKey = null;
     X509Certificate rsaCertificate ;
 
     Connection ino;
@@ -70,7 +72,19 @@ public class ClientVerifier {
         rsaCertificate = wallet.getRsaCertificate();
 
 
-      //    = CryptUtil.getPublicKeyFromCertFile(rsaCertFile,"RSA");
+
+       /* System.out.println(Base64.getEncoder().encodeToString(rsaPublicKey.getEncoded()));
+        getPublicFromPrivate();*/
+
+
+        try {
+            Thread.sleep(20000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+        //    = CryptUtil.getPublicKeyFromCertFile(rsaCertFile,"RSA");
         //  = CryptUtil.getPrivateKeyDerFromFile(rsaPrivateFile,"RSA");
 
          ino = new Connection(inoURL,publicKey,privateKey,certificate);
@@ -80,6 +94,23 @@ public class ClientVerifier {
 
         init();
 
+    }
+
+
+    public void getPublicFromPrivate()
+    {
+        RSAPrivateCrtKey rsaPrivateKey1 = (RSAPrivateCrtKey)rsaPrivateKey;
+
+        //create a KeySpec and let the Factory due the Rest. You could also create the KeyImpl by your own.
+        PublicKey publicKey = null;
+        try {
+            publicKey = KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(rsaPrivateKey1.getModulus(), rsaPrivateKey1.getPublicExponent()));
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        System.out.println(Base64.getEncoder().encodeToString(publicKey.getEncoded())); //store it - that's it
     }
 
     private void init()
