@@ -5,10 +5,7 @@ import data.VerifiedClaim;
 import data.VerifyRequest;
 import shareablemerkletree.AttributeNode;
 import shareablemerkletree.MerkleTree;
-import util.CertUtil;
-import util.CryptUtil;
-import util.MerkleTreeUtil;
-import util.VerifiedClaimSignUtil;
+import util.*;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -126,6 +123,8 @@ public class ClaimManager {
         VerifiedClaim verifiedClaim3 = inoMock3.verifyIdentityAndGenerateClaim(request);
 
         VerifiedClaim superClaim = generateSuperClaim(verifiedClaim1,verifiedClaim2,verifiedClaim3);
+
+        //System.out.println(JSONUtil.toPrettyJSON(superClaim));
 
         return superClaim;
 

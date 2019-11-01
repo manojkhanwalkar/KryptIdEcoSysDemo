@@ -34,15 +34,15 @@ public class ClientProxyResource {
 
 
 
-    @GET
+    @POST
     @Timed
     @Path("/verify")
     @Produces(MediaType.APPLICATION_JSON)
-    public String verify() {
+    public String verify(VerifyRequest verifyRequest) {
 
 
         INOConnector connector =  INOConnector.buildINOConnector();
-        VerifyRequest verifyRequest = INOConnector.makeSampleRequest();
+      //  VerifyRequest verifyRequest = INOConnector.makeSampleRequest();
         TransactionNumber transactionNumber = connector.verify(verifyRequest);
         return transactionNumber.getTransactionId();
        //TODO - pass in request later

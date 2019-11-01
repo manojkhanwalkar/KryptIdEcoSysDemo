@@ -276,10 +276,13 @@ public class ClientVerifier {
 
        verifier.transact(claim); */
 
-    //    for (int i=0;i<32;i++) {
+//       for (int i=0;i<32;i++) {
 
             TransactionNumber transactionNumber;
             VerifyRequest request = makeSampleRequest();
+
+            System.out.println(JSONUtil.toJSON(request));
+
             transactionNumber = verifier.verify(request);
             VerifiedClaim claim = verifier.getClaim(transactionNumber);
 
@@ -289,7 +292,7 @@ public class ClientVerifier {
 
 
             //Thread.sleep(2000);
-     //   }
+    //   }
 
 
 

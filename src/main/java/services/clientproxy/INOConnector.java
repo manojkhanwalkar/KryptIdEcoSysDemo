@@ -132,11 +132,6 @@ public class INOConnector {
         System.out.println("Received encrypted claim " + encryptedVerifiedClaim);
 
 
-     /*   String encclaimStr = encryptedVerifiedClaim.getVerifiedClaim();
-        String key = encryptedVerifiedClaim.getEncryptedKey();
-        String claimStr = CryptUtil.decrypt(encclaimStr,key,rsaPrivateKey);
-
-        VerifiedClaim claim = (VerifiedClaim) JSONUtil.fromJSON(claimStr,VerifiedClaim.class);*/
 
         VerifiedClaim claim = convert(encryptedVerifiedClaim,rsaPrivateKey);
 
@@ -147,7 +142,7 @@ public class INOConnector {
 
         System.out.println("claim after decrypting " + claim);
 
-        Set<AttributeNode> nodes = new HashSet<>();
+   /*     Set<AttributeNode> nodes = new HashSet<>();
 
         AttributeNode attribNode1 = new AttributeNode();
         attribNode1.setName("FirstName");
@@ -159,7 +154,7 @@ public class INOConnector {
         nodes.addAll(List.of(attribNode1,attribNode2));
         MerkleTree partialTree = MerkleTreeUtil.buildPartial(claim.getTree(),nodes);
 
-        claim.setTree(partialTree);
+        claim.setTree(partialTree);*/
 
         //transact(claim);
 
@@ -184,8 +179,34 @@ public class INOConnector {
         return request;
     }
 
+
+    private VerifiedClaim partial(VerifiedClaim claim)
+    {
+           Set<AttributeNode> nodes = new HashSet<>();
+
+        AttributeNode attribNode1 = new AttributeNode();
+        attribNode1.setName("FirstName");
+
+        AttributeNode attribNode2 = new AttributeNode();
+        attribNode2.setName("LastName");
+
+
+        nodes.addAll(List.of(attribNode1,attribNode2));
+        MerkleTree partialTree = MerkleTreeUtil.buildPartial(claim.getTree(),nodes);
+
+        claim.setTree(partialTree);
+
+        return claim;
+
+    }
+
     public TransactionStatus transact(VerifiedClaim claim) throws Exception
     {
+
+        // create partial claim for presenting to sp
+
+        claim = partial(claim);
+
 
         String certStr = sp.get("claimkey");
 
