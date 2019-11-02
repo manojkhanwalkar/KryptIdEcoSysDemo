@@ -53,7 +53,6 @@ public class ClientProxyResource {
       //  VerifyRequest verifyRequest = INOConnector.makeSampleRequest();
         TransactionNumber transactionNumber = connector.verify(verifyRequest);
         return transactionNumber.getTransactionId();
-       //TODO - pass in request later
 
 
     }

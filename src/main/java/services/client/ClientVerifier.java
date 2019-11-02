@@ -4,6 +4,7 @@ import constants.Constants;
 import data.*;
 import org.apache.commons.codec.digest.Crypt;
 import services.client.wallet.SimpleWallet;
+import services.clientproxy.INOConnector;
 import shareablemerkletree.AttributeNode;
 import shareablemerkletree.MerkleTree;
 import util.*;
@@ -32,103 +33,29 @@ import static util.ClaimValidator.isValidClaim;
 public class ClientVerifier {
 
 
-    String rootCertFile = "/home/manoj/ca/certs/ca.cert.pem";
-    String interCertFile = "/home/manoj/ca/intermediate/certs/intermediate.cert.pem";
-
-
-    String certFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/clientcert.pem";
-    String privateFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/clientkey.der";
-
-    PublicKey publicKey;
-    PrivateKey privateKey;
-    X509Certificate certificate;
 
 
 
-  /*  PublicKey rsaPublicKey;
-    PrivateKey rsaPrivateKey = null;
-    X509Certificate rsaCertificate ; */
-
-    Connection ino;
-    Connection sp;
+    INOConnector connector =  INOConnector.buildINOConnector();
 
 
 
-    CertChainValidator certChainValidator ;
-
-
-    public ClientVerifier(String inoURL, String spURL)
+    public ClientVerifier()
     {
 
-         publicKey = CryptUtil.getPublicKeyFromCertFile(certFile,"EC");
-         privateKey = CryptUtil.getPrivateKeyDerFromFile(privateFile,"EC");
-         certificate = CertUtil.getCertificate(certFile);
-
-
-
-
-
-
-
-
-
-       /* System.out.println(Base64.getEncoder().encodeToString(rsaPublicKey.getEncoded()));
-        getPublicFromPrivate();*/
-
-
-
-        //    = CryptUtil.getPublicKeyFromCertFile(rsaCertFile,"RSA");
-        //  = CryptUtil.getPrivateKeyDerFromFile(rsaPrivateFile,"RSA");
-
-         ino = new Connection(inoURL,publicKey,privateKey,certificate);
-        sp = new Connection(spURL,publicKey,privateKey,certificate);
-
-        certChainValidator = new CertChainValidator(rootCertFile,interCertFile);
-
-        init();
 
     }
 
 
 
 
-    private void init()
-    {
-        try {
-            ino.connect();
-            sp.connect();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
 
 
     public TransactionNumber verify(VerifyRequest request) throws Exception
     {
 
-        SimpleWallet wallet = SimpleWallet.createWallet();
-
-
-        request.setRsaCert(CertUtil.getCertAsString(wallet.getRsaCertificate()));
-
-
-        //request.setRsaPublicKey(CryptUtil.convertPublicKeyToString(rsaPublicKey));
-
-        String str = JSONUtil.toJSON(request);
-
-        System.out.println("Sending verify request " + str);
-
-
-        String response = ino.send(str,"verify");
-
-        TransactionNumber transactionNumber= (TransactionNumber) JSONUtil.fromJSON(response,TransactionNumber.class);
-
-        wallet.setClaimId(transactionNumber.getTransactionId());
-
-        SimpleWallet.updateKeys(wallet);
-
-        return transactionNumber;
-
+        return connector.verify(request);
 
     }
 
@@ -136,30 +63,10 @@ public class ClientVerifier {
     public VerifiedClaim getClaim(TransactionNumber transactionNumber) throws Exception
     {
 
-        SimpleWallet wallet = SimpleWallet.getWallet(transactionNumber.getTransactionId());
-
-        String str = JSONUtil.toJSON(transactionNumber);
-
-        System.out.println("Sending claim request " + str);
+       return connector.getClaim(transactionNumber);
 
 
-        String response = ino.send(str,"claim");
-
-        EncryptedVerifiedClaim encryptedVerifiedClaim = (EncryptedVerifiedClaim) JSONUtil.fromJSON(response,EncryptedVerifiedClaim.class);
-
-        System.out.println("Received encrypted claim " + encryptedVerifiedClaim);
-
-
-        VerifiedClaim claim = convert(encryptedVerifiedClaim,wallet.getRsaPrivateKey());
-
-        isValidClaim(claim);
-
-
-
-
-        System.out.println("claim after decrypting " + claim);
-
-        Set<AttributeNode> nodes = new HashSet<>();
+  /*      Set<AttributeNode> nodes = new HashSet<>();
 
         AttributeNode attribNode1 = new AttributeNode();
         attribNode1.setName("FirstName");
@@ -171,11 +78,10 @@ public class ClientVerifier {
         nodes.addAll(List.of(attribNode1,attribNode2));
         MerkleTree partialTree = MerkleTreeUtil.buildPartial(claim.getTree(),nodes);
 
-        claim.setTree(partialTree);
+        claim.setTree(partialTree); */
 
         //transact(claim);
 
-        return claim;
 
     }
 
@@ -196,34 +102,10 @@ public class ClientVerifier {
         return request;
     }
 
-    public void transact(VerifiedClaim claim) throws Exception
+    public TransactionStatus transact(VerifiedClaim claim) throws Exception
     {
 
-        String certStr = sp.get("claimkey");
-
-        System.out.println("Got public key cert from service provider " + certStr);
-
-        boolean result = certChainValidator.validate(certStr);
-
-        System.out.println("############## Service provider cert is " +  result);
-
-
-
-
-        PublicKey publicKey = CertUtil.getCertFromString(certStr).getPublicKey();
-
-       // EncryptedVerifiedClaim encryptedVerifiedClaim = convert(claim,spPublicKey);
-
-        EncryptedVerifiedClaim encryptedVerifiedClaim = convert(claim,publicKey);
-
-        //String claimStr = JSONUtil.toJSON(claim);
-
-      //  System.out.println("Sending partial pii claim to service provider " + claimStr);
-        String encryptedVerifiedClaimStr = JSONUtil.toJSON(encryptedVerifiedClaim);
-
-        String response = sp.send(encryptedVerifiedClaimStr,"transact");
-
-        System.out.println("And the credit result is " + response);
+        return connector.transact(claim);
     }
 
 
@@ -234,19 +116,10 @@ public class ClientVerifier {
 
     public static void main(String[] args) throws Exception {
 
-        DiscoveryClient discoveryClient = new DiscoveryClient(Constants.discoveryServiceUrl);
 
-        String inoUrl = discoveryClient.service(Constants.INOServiceType).getServiceUrl();
 
-        String spUrl = discoveryClient.service(Constants.SPServiceType).getServiceUrl();
 
-        System.out.println("INO service available at " + inoUrl);
-
-        System.out.println("SP service available at " + spUrl);
-
-    //    ClientVerifier verifier = new ClientVerifier("https://172.17.0.1:8180/", "https://172.17.0.1:8380/");
-
-        ClientVerifier verifier = new ClientVerifier(inoUrl,spUrl);
+        ClientVerifier verifier = new ClientVerifier();
 
 
        // verifier.exchangeKeys();
@@ -295,7 +168,7 @@ public class ClientVerifier {
 
             System.out.println(JSONUtil.toPrettyJSON(claim));
 
-            verifier.transact(claim);
+            System.out.println(verifier.transact(claim));
 
 
             //Thread.sleep(2000);
