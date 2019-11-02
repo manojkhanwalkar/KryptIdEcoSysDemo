@@ -67,9 +67,7 @@ public class ClientVerifier {
          certificate = CertUtil.getCertificate(certFile);
 
 
-       /* rsaPublicKey = wallet.getRsaPublicKey();
-        rsaPrivateKey = wallet.getRsaPrivateKey();
-        rsaCertificate = wallet.getRsaCertificate();*/
+
 
        System.out.println("Creating certificate and keys");
 
@@ -78,6 +76,17 @@ public class ClientVerifier {
         rsaPrivateKey = certificateCreator.getPrivateKey();
         rsaCertificate = certificateCreator.getCertificate();
         System.out.println("Created");
+
+
+      /*  rsaPublicKey = wallet.getRsaPublicKey();
+        rsaPrivateKey = wallet.getRsaPrivateKey();
+        rsaCertificate = wallet.getRsaCertificate();*/
+
+      wallet.setRsaCertificate(rsaCertificate);
+      wallet.setRsaPrivateKey(rsaPrivateKey);
+      wallet.setRsaPublicKey(rsaPublicKey);
+
+      wallet.updateKeys();
 
 
 

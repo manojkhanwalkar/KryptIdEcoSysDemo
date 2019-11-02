@@ -2,6 +2,7 @@ package services.clientproxy;
 
 import com.codahale.metrics.annotation.Timed;
 import data.*;
+import services.client.wallet.SimpleWallet;
 import util.*;
 
 import javax.ws.rs.GET;
@@ -26,11 +27,39 @@ public class ClientProxyResource {
     private final String defaultName;
 
 
+    SimpleWallet wallet = new SimpleWallet();
 
     public ClientProxyResource(String template, String defaultName) {
         this.template = template;
         this.defaultName = defaultName;
     }
+
+
+
+    private void populateWalletWithKeys()
+    {
+        System.out.println("Creating certificate and keys");
+
+        CertificateCreator certificateCreator = new CertificateCreator();
+        PublicKey rsaPublicKey = certificateCreator.getPublicKey();
+        PrivateKey rsaPrivateKey = certificateCreator.getPrivateKey();
+        X509Certificate rsaCertificate = certificateCreator.getCertificate();
+        System.out.println("Created");
+
+
+      /*  rsaPublicKey = wallet.getRsaPublicKey();
+        rsaPrivateKey = wallet.getRsaPrivateKey();
+        rsaCertificate = wallet.getRsaCertificate();*/
+
+        wallet.setRsaCertificate(rsaCertificate);
+        wallet.setRsaPrivateKey(rsaPrivateKey);
+        wallet.setRsaPublicKey(rsaPublicKey);
+
+        wallet.updateKeys();
+
+
+    }
+
 
 
 
@@ -41,7 +70,8 @@ public class ClientProxyResource {
     public String verify(VerifyRequest verifyRequest) {
 
 
-        INOConnector connector =  INOConnector.buildINOConnector();
+        INOConnector connector =  INOConnector.buildINOConnector(wallet);
+
       //  VerifyRequest verifyRequest = INOConnector.makeSampleRequest();
         TransactionNumber transactionNumber = connector.verify(verifyRequest);
         return transactionNumber.getTransactionId();
@@ -57,7 +87,7 @@ public class ClientProxyResource {
     public VerifiedClaim claim(String transactionId) {
 
         try {
-            INOConnector connector =  INOConnector.buildINOConnector();
+            INOConnector connector =  INOConnector.buildINOConnector(wallet);
             TransactionNumber transactionNumber = new TransactionNumber();
 
             transactionNumber.setTransactionId(transactionId);
@@ -78,7 +108,7 @@ public class ClientProxyResource {
     public TransactionStatus transact(String transactionId) {
 
         try {
-            INOConnector connector =  INOConnector.buildINOConnector();
+            INOConnector connector =  INOConnector.buildINOConnector(wallet);
             TransactionNumber transactionNumber = new TransactionNumber();
 
             transactionNumber.setTransactionId(transactionId);

@@ -62,6 +62,27 @@ public class SimpleWallet {
 
     }
 
+    public void setRsaPublicKey(PublicKey rsaPublicKey) {
+        this.rsaPublicKey = rsaPublicKey;
+    }
+
+    public void setRsaPrivateKey(PrivateKey rsaPrivateKey) {
+        this.rsaPrivateKey = rsaPrivateKey;
+    }
+
+    public void setRsaCertificate(X509Certificate rsaCertificate) {
+        this.rsaCertificate = rsaCertificate;
+    }
+
+    public void updateKeys()
+    {
+        simpleWalletRecord.setCertificate(CertUtil.getCertAsString(rsaCertificate));
+        simpleWalletRecord.setPublicKey(CryptUtil.convertPublicKeyToString(rsaPublicKey));
+        simpleWalletRecord.setPrivateKey(CryptUtil.convertPrivateKeyToString(rsaPrivateKey));
+        mapper.save(simpleWalletRecord);
+
+    }
+
 
     static    String table_name = "SimpleWallet";
 

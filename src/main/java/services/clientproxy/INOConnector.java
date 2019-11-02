@@ -56,12 +56,15 @@ public class INOConnector {
          certificate = CertUtil.getCertificate(certFile);
 
 
-        rsaPublicKey = wallet.getRsaPublicKey();
+      /*  rsaPublicKey = wallet.getRsaPublicKey();
         rsaPrivateKey = wallet.getRsaPrivateKey();
-        rsaCertificate = wallet.getRsaCertificate();
+        rsaCertificate = wallet.getRsaCertificate(); */
 
 
-      //    = CryptUtil.getPublicKeyFromCertFile(rsaCertFile,"RSA");
+
+
+
+        //    = CryptUtil.getPublicKeyFromCertFile(rsaCertFile,"RSA");
         //  = CryptUtil.getPrivateKeyDerFromFile(rsaPrivateFile,"RSA");
 
          ino = new Connection(inoURL,publicKey,privateKey,certificate);
@@ -242,7 +245,7 @@ public class INOConnector {
 
 
 
-public static INOConnector buildINOConnector()
+public static INOConnector buildINOConnector(SimpleWallet wallet)
 {
     try {
         DiscoveryClient discoveryClient = new DiscoveryClient(Constants.discoveryServiceUrl);
@@ -257,9 +260,10 @@ public static INOConnector buildINOConnector()
 
         //    ClientVerifier verifier = new ClientVerifier("https://172.17.0.1:8180/", "https://172.17.0.1:8380/");
 
-        INOConnector verifier = new INOConnector(inoUrl,spUrl);
+        INOConnector connector = new INOConnector(inoUrl,spUrl);
+        connector.setWallet(wallet);
 
-        return verifier;
+        return connector;
     } catch (Exception e) {
         e.printStackTrace();
     }
@@ -302,5 +306,10 @@ public static INOConnector buildINOConnector()
     }
 
 
-
+    public void setWallet(SimpleWallet wallet) {
+        this.wallet = wallet;
+        rsaPrivateKey = wallet.getRsaPrivateKey();
+        rsaPublicKey = wallet.getRsaPublicKey();
+        rsaCertificate = wallet.getRsaCertificate();
+    }
 }
