@@ -16,6 +16,9 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import static data.Identity.PIIAttributes;
+
+
 public abstract class INOMock {
 
     String certFile , privateFile;

@@ -11,6 +11,8 @@ import util.MerkleTreeUtil;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import static data.Identity.PIIAttributes;
+
 
 public class EmailValidator extends INOMock {
 
@@ -25,12 +27,12 @@ public class EmailValidator extends INOMock {
 
         Identity identity = request.getIdentity();
 
-
-
         AttributeNode attribNode1 = new AttributeNode();
-        attribNode1.setName("Email");
-        attribNode1.setValue(identity.getEmail());
-        attribNode1.setId(secureRandom.nextInt());
+        if (identity.getEmail()!=null) {
+            attribNode1.setName(PIIAttributes.Email.toString());
+            attribNode1.setValue(identity.getEmail());
+            attribNode1.setId(secureRandom.nextInt());
+        }
 
         boolean result = isValid(identity.getEmail());
         attribNode1.setStatus((result? AttributeNode.Status.Valid: AttributeNode.Status.Fraud));

@@ -2,12 +2,15 @@ package util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import data.Identity;
 import shareablemerkletree.*;
 import shareablemerkletree.Node;
 
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.time.LocalDate;
 import java.util.*;
+import static data.Identity.PIIAttributes.*;
 
 public class MerkleTreeUtil {
 
@@ -213,6 +216,70 @@ public class MerkleTreeUtil {
         return traverseAndValidateHashInTree(tree.getRoot());
 
 
+    }
+
+    public static Identity getIdentityAttributes(MerkleTree tree)
+    {
+        List<AttributeNode> attributeNodes = new ArrayList<>();
+        getIdentityAttributes(tree.getRoot(),attributeNodes);
+
+        Identity identity = new Identity();
+        attributeNodes.stream().forEach((n-> {
+            if (n.getName().equals(FirstName.toString()))
+            {
+                identity.setFirstName(n.getValue());
+                return;
+            }
+            if (n.getName().equals(LastName.toString()))
+            {
+                identity.setLastName(n.getValue());
+                return;
+            }
+            if (n.getName().equals(SSN.toString()))
+            {
+                identity.setSsn(n.getValue());
+                return;
+            }
+            if (n.getName().equals(Email.toString()))
+            {
+                identity.setEmail(n.getValue());
+                return;
+            }
+            if (n.getName().equals(Address.toString()))
+            {
+                identity.setAddress(n.getValue());
+                return;
+            }
+            if (n.getName().equals(BirthDate.toString()))
+            {
+                identity.setBirthDate(LocalDate.parse(n.getValue()));
+                return;
+            }
+            if (n.getName().equals(Zip.toString()))
+            {
+                identity.setZip(n.getValue());
+                return;
+            }
+
+
+
+        }));
+
+        return identity;
+
+    }
+
+    private static void getIdentityAttributes(Node node , List<AttributeNode> attributeNodes)
+    {
+        if (node==null)
+            return;
+        if (node instanceof AttributeNode)
+        {
+            attributeNodes.add((AttributeNode)node);
+            return;
+        }
+        getIdentityAttributes(node.getLeft(),attributeNodes);
+        getIdentityAttributes(node.getRight(),attributeNodes);
     }
 
     private static boolean traverseAndValidateHashInTree(Node root)

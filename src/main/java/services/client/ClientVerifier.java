@@ -3,6 +3,7 @@ package services.client;
 import constants.Constants;
 import data.*;
 import org.apache.commons.codec.digest.Crypt;
+
 import services.client.wallet.SimpleWallet;
 import services.clientproxy.INOConnector;
 import shareablemerkletree.AttributeNode;
@@ -23,6 +24,7 @@ import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -109,13 +111,21 @@ public class ClientVerifier {
     }
 
 
+    public TransactionNumber addAttribute(AddAttributeRequest addAttributeRequest)
+    {
+        /* get existing claim , create Identity object from that , add attributes to the identity object and create new verify request,  and return the claimId of the newly created claim
+         */
+
+        return null;
+    }
+
+
 
 
 
 
 
     public static void main(String[] args) throws Exception {
-
 
 
 
@@ -158,6 +168,12 @@ public class ClientVerifier {
 
 //       for (int i=0;i<32;i++) {
 
+            AddAttributeRequest addAttributeRequest = new AddAttributeRequest();
+            addAttributeRequest.put(Identity.PIIAttributes.FirstName,"Changed");
+        addAttributeRequest.put(Identity.PIIAttributes.LastName,"Also Changed");
+
+        System.out.println(JSONUtil.toJSON(addAttributeRequest));
+
             TransactionNumber transactionNumber;
             VerifyRequest request = makeSampleRequest();
 
@@ -166,9 +182,59 @@ public class ClientVerifier {
             transactionNumber = verifier.verify(request);
             VerifiedClaim claim = verifier.getClaim(transactionNumber);
 
-            System.out.println(JSONUtil.toPrettyJSON(claim));
+            MerkleTree tree = claim.getTree();
 
-            System.out.println(verifier.transact(claim));
+            Identity identity = MerkleTreeUtil.getIdentityAttributes(tree);
+
+            System.out.println(identity);
+            
+            // iterate over add attribute request and set it on identity
+
+        addAttributeRequest.getAttributes().entrySet().stream().forEach((entry)-> {
+
+            switch(entry.getKey())
+            {
+                case FirstName:
+                    identity.setFirstName(entry.getValue());
+                    break;
+                case LastName:
+                    identity.setLastName(entry.getValue());
+                    break;
+                    case Zip:
+                identity.setZip(entry.getValue());
+                break;
+                case Address:
+                identity.setAddress(entry.getValue());
+                break;
+                case SSN:
+                identity.setSsn(entry.getValue());
+                break;
+                case Email:
+                identity.setEmail(entry.getValue());
+                break;
+                case BirthDate:
+                identity.setBirthDate(LocalDate.parse(entry.getValue()));
+                break;
+
+                default :
+                    System.out.println("Erroneous attribute " + entry);
+
+            }
+
+        });
+
+           // identity.setFirstName("Changed");
+
+            request = new VerifyRequest();
+            request.setIdentity(identity);
+
+             transactionNumber = verifier.verify(request);
+             VerifiedClaim claim1 = verifier.getClaim(transactionNumber);
+
+
+            System.out.println(JSONUtil.toPrettyJSON(claim1));
+
+            System.out.println(verifier.transact(claim1));
 
 
             //Thread.sleep(2000);

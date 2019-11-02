@@ -7,6 +7,9 @@ import java.time.LocalDate;
 
 public class Identity {
 
+
+    public  enum PIIAttributes  {FirstName, LastName, BirthDate, Address , Zip , Email ,SSN };
+
     private String firstName;
     private String lastName;
     private LocalDate birthDate;

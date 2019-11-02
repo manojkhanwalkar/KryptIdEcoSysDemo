@@ -11,6 +11,8 @@ import util.MerkleTreeUtil;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import static data.Identity.PIIAttributes;
+
 
 public class SSNValidator extends INOMock {
 
@@ -25,17 +27,17 @@ public class SSNValidator extends INOMock {
 
         Identity identity = request.getIdentity();
 
-
-
         AttributeNode attribNode1 = new AttributeNode();
-        attribNode1.setName("SSN");
-        attribNode1.setValue(identity.getSsn());
-        attribNode1.setId(secureRandom.nextInt());
 
-        boolean result = isValid(identity.getSsn());
+        if (identity.getSsn()!=null) {
+            attribNode1.setName(PIIAttributes.SSN.toString());
+            attribNode1.setValue(identity.getSsn());
+            attribNode1.setId(secureRandom.nextInt());
+        }
 
-        attribNode1.setStatus((result? AttributeNode.Status.Valid: AttributeNode.Status.Fraud));
+            boolean result = isValid(identity.getSsn());
 
+            attribNode1.setStatus((result ? AttributeNode.Status.Valid : AttributeNode.Status.Fraud));
 
 
         MerkleTreeUtil util = new MerkleTreeUtil();
