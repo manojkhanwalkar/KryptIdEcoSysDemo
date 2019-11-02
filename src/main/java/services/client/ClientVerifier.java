@@ -67,21 +67,23 @@ public class ClientVerifier {
          certificate = CertUtil.getCertificate(certFile);
 
 
-        rsaPublicKey = wallet.getRsaPublicKey();
+       /* rsaPublicKey = wallet.getRsaPublicKey();
         rsaPrivateKey = wallet.getRsaPrivateKey();
-        rsaCertificate = wallet.getRsaCertificate();
+        rsaCertificate = wallet.getRsaCertificate();*/
+
+       System.out.println("Creating certificate and keys");
+
+        CertificateCreator certificateCreator = new CertificateCreator();
+        rsaPublicKey = certificateCreator.getPublicKey();
+        rsaPrivateKey = certificateCreator.getPrivateKey();
+        rsaCertificate = certificateCreator.getCertificate();
+        System.out.println("Created");
 
 
 
        /* System.out.println(Base64.getEncoder().encodeToString(rsaPublicKey.getEncoded()));
         getPublicFromPrivate();*/
 
-
-        try {
-            Thread.sleep(20000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
 
         //    = CryptUtil.getPublicKeyFromCertFile(rsaCertFile,"RSA");

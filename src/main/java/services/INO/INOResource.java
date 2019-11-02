@@ -87,7 +87,7 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
         VerifyRequest verifyRequest = (VerifyRequest) JSONUtil.fromJSON(requestStr,VerifyRequest.class);
         System.out.println(verifyRequest);
 
-        logManager.submit(verifyRequest);
+        //logManager.submit(verifyRequest);
 
 
 
