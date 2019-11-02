@@ -36,14 +36,10 @@ public class INOConnector {
     X509Certificate certificate;
 
 
-    PublicKey rsaPublicKey;
-    PrivateKey rsaPrivateKey;
-    X509Certificate rsaCertificate ;
 
     Connection ino;
     Connection sp;
 
-    SimpleWallet wallet = new SimpleWallet();
 
     CertChainValidator certChainValidator ;
 
@@ -56,16 +52,6 @@ public class INOConnector {
          certificate = CertUtil.getCertificate(certFile);
 
 
-      /*  rsaPublicKey = wallet.getRsaPublicKey();
-        rsaPrivateKey = wallet.getRsaPrivateKey();
-        rsaCertificate = wallet.getRsaCertificate(); */
-
-
-
-
-
-        //    = CryptUtil.getPublicKeyFromCertFile(rsaCertFile,"RSA");
-        //  = CryptUtil.getPrivateKeyDerFromFile(rsaPrivateFile,"RSA");
 
          ino = new Connection(inoURL,publicKey,privateKey,certificate);
         sp = new Connection(spURL,publicKey,privateKey,certificate);
@@ -90,12 +76,12 @@ public class INOConnector {
     public TransactionNumber verify(VerifyRequest request)
     {
 
+        SimpleWallet wallet = SimpleWallet.createWallet();
 
         try {
-            request.setRsaCert(CertUtil.getCertAsString(rsaCertificate));
 
 
-            //request.setRsaPublicKey(CryptUtil.convertPublicKeyToString(rsaPublicKey));
+            request.setRsaCert(CertUtil.getCertAsString(wallet.getRsaCertificate()));
 
             String str = JSONUtil.toJSON(request);
 
@@ -106,7 +92,9 @@ public class INOConnector {
 
             TransactionNumber transactionNumber= (TransactionNumber) JSONUtil.fromJSON(response,TransactionNumber.class);
 
-            wallet.updateClaimId(transactionNumber.getTransactionId());
+            wallet.setClaimId(transactionNumber.getTransactionId());
+
+            SimpleWallet.updateKeys(wallet);
 
             return transactionNumber;
         } catch (Exception e) {
@@ -121,6 +109,7 @@ public class INOConnector {
     public VerifiedClaim getClaim(TransactionNumber transactionNumber) throws Exception
     {
 
+        SimpleWallet wallet = SimpleWallet.getWallet(transactionNumber.getTransactionId());
 
 
         String str = JSONUtil.toJSON(transactionNumber);
@@ -135,8 +124,8 @@ public class INOConnector {
         System.out.println("Received encrypted claim " + encryptedVerifiedClaim);
 
 
+        VerifiedClaim claim = convert(encryptedVerifiedClaim,wallet.getRsaPrivateKey());
 
-        VerifiedClaim claim = convert(encryptedVerifiedClaim,rsaPrivateKey);
 
         isValidClaim(claim);
 
@@ -145,21 +134,6 @@ public class INOConnector {
 
         System.out.println("claim after decrypting " + claim);
 
-   /*     Set<AttributeNode> nodes = new HashSet<>();
-
-        AttributeNode attribNode1 = new AttributeNode();
-        attribNode1.setName("FirstName");
-
-        AttributeNode attribNode2 = new AttributeNode();
-        attribNode2.setName("LastName");
-
-
-        nodes.addAll(List.of(attribNode1,attribNode2));
-        MerkleTree partialTree = MerkleTreeUtil.buildPartial(claim.getTree(),nodes);
-
-        claim.setTree(partialTree);*/
-
-        //transact(claim);
 
         return claim;
 
@@ -245,7 +219,7 @@ public class INOConnector {
 
 
 
-public static INOConnector buildINOConnector(SimpleWallet wallet)
+public static INOConnector buildINOConnector()
 {
     try {
         DiscoveryClient discoveryClient = new DiscoveryClient(Constants.discoveryServiceUrl);
@@ -261,7 +235,6 @@ public static INOConnector buildINOConnector(SimpleWallet wallet)
         //    ClientVerifier verifier = new ClientVerifier("https://172.17.0.1:8180/", "https://172.17.0.1:8380/");
 
         INOConnector connector = new INOConnector(inoUrl,spUrl);
-        connector.setWallet(wallet);
 
         return connector;
     } catch (Exception e) {
@@ -273,17 +246,6 @@ public static INOConnector buildINOConnector(SimpleWallet wallet)
 }
 
 
-
-
-
-        /*    TransactionNumber transactionNumber;
-            VerifyRequest request = makeSampleRequest();
-            transactionNumber = verifier.verify(request);
-            VerifiedClaim claim = verifier.getClaim(transactionNumber);
-
-            System.out.println(JSONUtil.toPrettyJSON(claim));
-
-            verifier.transact(claim); */
 
 
 
@@ -306,10 +268,5 @@ public static INOConnector buildINOConnector(SimpleWallet wallet)
     }
 
 
-    public void setWallet(SimpleWallet wallet) {
-        this.wallet = wallet;
-        rsaPrivateKey = wallet.getRsaPrivateKey();
-        rsaPublicKey = wallet.getRsaPublicKey();
-        rsaCertificate = wallet.getRsaCertificate();
-    }
+
 }

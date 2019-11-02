@@ -27,16 +27,30 @@ public class SimpleWalletCreator {
 
 
     public static void main(String[] args) {
-       // createTable();
 
-        SimpleWalletCreator wallet = new SimpleWalletCreator();
+      //  deleteTable();
+        createTable();
+
+       /* SimpleWalletCreator wallet = new SimpleWalletCreator();
+
+
 
 
       //  wallet.insertKeys();
 
-        wallet.printKeys();
+        wallet.printKeys();*/
 
 
+    }
+
+    public static void deleteTable() {
+
+        final AmazonDynamoDB ddb = getHandle();
+
+
+        DeleteTableResult result = ddb.deleteTable(table_name);
+
+        System.out.println(result);
     }
 
     public void function(final AmazonDynamoDB client, final String tableName, final String ttlField){
@@ -116,7 +130,7 @@ public class SimpleWalletCreator {
 
         SimpleWalletRecord simpleWalletRecord = new SimpleWalletRecord();
 
-        simpleWalletRecord.setId("2");
+
         simpleWalletRecord.setPrivateKey(privateKey);
         simpleWalletRecord.setPublicKey(publicKey);
         simpleWalletRecord.setCertificate(certStr);
@@ -134,13 +148,13 @@ public class SimpleWalletCreator {
 
         List<AttributeDefinition> definitions = new ArrayList<>();
         definitions.add(new AttributeDefinition(
-                "id", ScalarAttributeType.S));
+                "claimId", ScalarAttributeType.S));
        /* definitions.add(new AttributeDefinition(
                 "Identity", ScalarAttributeType.S)); */
 
         CreateTableRequest request = new CreateTableRequest()
                 .withAttributeDefinitions(definitions)
-                .withKeySchema(new KeySchemaElement("id", KeyType.HASH))
+                .withKeySchema(new KeySchemaElement("claimId", KeyType.HASH))
                 .withProvisionedThroughput(new ProvisionedThroughput(
                         new Long(10), new Long(10)))
                 .withTableName(table_name);
@@ -152,7 +166,7 @@ public class SimpleWalletCreator {
 
         try {
             CreateTableResult result = ddb.createTable(request);
-            System.out.println(result.getTableDescription());
+            System.out.println(result);
         } catch (AmazonServiceException e) {
             System.err.println(e.getErrorMessage());
             System.exit(1);

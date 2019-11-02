@@ -8,9 +8,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 public class SimpleWalletRecord {
 
 
-    @DynamoDBHashKey(attributeName = "id")
-    private String id;
-    @DynamoDBAttribute(attributeName="claimId")
+
+    @DynamoDBHashKey(attributeName="claimId")
     private String claimId;
     @DynamoDBAttribute(attributeName="publicKey")
     private String publicKey;
@@ -28,13 +27,7 @@ public class SimpleWalletRecord {
         this.certificate = certificate;
     }
 
-    public String getId() {
-        return id;
-    }
 
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getClaimId() {
         return claimId;
@@ -64,8 +57,7 @@ public class SimpleWalletRecord {
     @Override
     public String toString() {
         return "SimpleWalletRecord{" +
-                "id='" + id + '\'' +
-                ", claimId='" + claimId + '\'' +
+                "claimId='" + claimId + '\'' +
                 ", publicKey='" + publicKey + '\'' +
                 ", privateKey='" + privateKey + '\'' +
                 ", certificate='" + certificate + '\'' +

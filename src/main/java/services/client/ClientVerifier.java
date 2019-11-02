@@ -44,17 +44,15 @@ public class ClientVerifier {
     X509Certificate certificate;
 
 
-   // String rsaCertFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/userrsacertificate.pem";
-  //  String rsaPrivateFile = "/home/manoj/IdeaProjects/KryptIdEcoSysDemo/src/main/resources/userrsakey.der";
 
-    PublicKey rsaPublicKey;
+  /*  PublicKey rsaPublicKey;
     PrivateKey rsaPrivateKey = null;
-    X509Certificate rsaCertificate ;
+    X509Certificate rsaCertificate ; */
 
     Connection ino;
     Connection sp;
 
-    SimpleWallet wallet = new SimpleWallet();
+
 
     CertChainValidator certChainValidator ;
 
@@ -69,24 +67,8 @@ public class ClientVerifier {
 
 
 
-       System.out.println("Creating certificate and keys");
-
-        CertificateCreator certificateCreator = new CertificateCreator();
-        rsaPublicKey = certificateCreator.getPublicKey();
-        rsaPrivateKey = certificateCreator.getPrivateKey();
-        rsaCertificate = certificateCreator.getCertificate();
-        System.out.println("Created");
 
 
-      /*  rsaPublicKey = wallet.getRsaPublicKey();
-        rsaPrivateKey = wallet.getRsaPrivateKey();
-        rsaCertificate = wallet.getRsaCertificate();*/
-
-      wallet.setRsaCertificate(rsaCertificate);
-      wallet.setRsaPrivateKey(rsaPrivateKey);
-      wallet.setRsaPublicKey(rsaPublicKey);
-
-      wallet.updateKeys();
 
 
 
@@ -108,21 +90,7 @@ public class ClientVerifier {
     }
 
 
-    public void getPublicFromPrivate()
-    {
-        RSAPrivateCrtKey rsaPrivateKey1 = (RSAPrivateCrtKey)rsaPrivateKey;
 
-        //create a KeySpec and let the Factory due the Rest. You could also create the KeyImpl by your own.
-        PublicKey publicKey = null;
-        try {
-            publicKey = KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(rsaPrivateKey1.getModulus(), rsaPrivateKey1.getPublicExponent()));
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        System.out.println(Base64.getEncoder().encodeToString(publicKey.getEncoded())); //store it - that's it
-    }
 
     private void init()
     {
@@ -138,9 +106,10 @@ public class ClientVerifier {
     public TransactionNumber verify(VerifyRequest request) throws Exception
     {
 
+        SimpleWallet wallet = SimpleWallet.createWallet();
 
 
-        request.setRsaCert(CertUtil.getCertAsString(rsaCertificate));
+        request.setRsaCert(CertUtil.getCertAsString(wallet.getRsaCertificate()));
 
 
         //request.setRsaPublicKey(CryptUtil.convertPublicKeyToString(rsaPublicKey));
@@ -154,7 +123,9 @@ public class ClientVerifier {
 
         TransactionNumber transactionNumber= (TransactionNumber) JSONUtil.fromJSON(response,TransactionNumber.class);
 
-        wallet.updateClaimId(transactionNumber.getTransactionId());
+        wallet.setClaimId(transactionNumber.getTransactionId());
+
+        SimpleWallet.updateKeys(wallet);
 
         return transactionNumber;
 
@@ -165,7 +136,7 @@ public class ClientVerifier {
     public VerifiedClaim getClaim(TransactionNumber transactionNumber) throws Exception
     {
 
-
+        SimpleWallet wallet = SimpleWallet.getWallet(transactionNumber.getTransactionId());
 
         String str = JSONUtil.toJSON(transactionNumber);
 
@@ -179,13 +150,7 @@ public class ClientVerifier {
         System.out.println("Received encrypted claim " + encryptedVerifiedClaim);
 
 
-     /*   String encclaimStr = encryptedVerifiedClaim.getVerifiedClaim();
-        String key = encryptedVerifiedClaim.getEncryptedKey();
-        String claimStr = CryptUtil.decrypt(encclaimStr,key,rsaPrivateKey);
-
-        VerifiedClaim claim = (VerifiedClaim) JSONUtil.fromJSON(claimStr,VerifiedClaim.class);*/
-
-        VerifiedClaim claim = convert(encryptedVerifiedClaim,rsaPrivateKey);
+        VerifiedClaim claim = convert(encryptedVerifiedClaim,wallet.getRsaPrivateKey());
 
         isValidClaim(claim);
 
@@ -355,6 +320,23 @@ public class ClientVerifier {
         return isAfter;
 
     }
+
+
+    /* public void getPublicFromPrivate()
+    {
+        RSAPrivateCrtKey rsaPrivateKey1 = (RSAPrivateCrtKey)rsaPrivateKey;
+
+        //create a KeySpec and let the Factory due the Rest. You could also create the KeyImpl by your own.
+        PublicKey publicKey = null;
+        try {
+            publicKey = KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(rsaPrivateKey1.getModulus(), rsaPrivateKey1.getPublicExponent()));
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        System.out.println(Base64.getEncoder().encodeToString(publicKey.getEncoded())); //store it - that's it
+    }*/
 
 
 

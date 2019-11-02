@@ -9,6 +9,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.model.*;
 import data.SimpleWalletRecord;
 import util.CertUtil;
+import util.CertificateCreator;
 import util.CryptUtil;
 
 import java.security.PrivateKey;
@@ -36,31 +37,55 @@ public class SimpleWallet {
     }
 
 
-    DynamoDBMapper mapper;
+    static DynamoDBMapper mapper;
 
-    AmazonDynamoDB ddb;
+    static AmazonDynamoDB ddb;
 
     PublicKey rsaPublicKey;
     PrivateKey rsaPrivateKey;
+    String claimId;
 
     X509Certificate rsaCertificate;
 
-    SimpleWalletRecord simpleWalletRecord;
 
-    public SimpleWallet()
+    private SimpleWallet()
     {
         ddb = getHandle();
         mapper = new DynamoDBMapper(ddb);
 
-        simpleWalletRecord =  mapper.load(SimpleWalletRecord.class, "1");
+     /*   simpleWalletRecord
 
-        rsaPublicKey = CryptUtil.convertStringtoPublicKey(simpleWalletRecord.getPublicKey(),"RSA");
-        rsaPrivateKey = CryptUtil.convertStringtoPrivateKey(simpleWalletRecord.getPrivateKey(),"RSA");
-
-        rsaCertificate = CertUtil.getCertFromString(simpleWalletRecord.getCertificate());
+       */
 
 
     }
+
+
+    public static SimpleWallet createWallet()
+    {
+        SimpleWallet wallet = new SimpleWallet();
+        CertificateCreator certificateCreator = new CertificateCreator();
+        wallet.setRsaPublicKey(certificateCreator.getPublicKey());
+        wallet.setRsaPrivateKey(certificateCreator.getPrivateKey());
+        wallet.setRsaCertificate(certificateCreator.getCertificate());
+        return wallet;
+
+    }
+
+    public static SimpleWallet getWallet(String claimId)
+    {
+        SimpleWallet wallet = new SimpleWallet();
+
+        SimpleWalletRecord simpleWalletRecord =  mapper.load(SimpleWalletRecord.class, claimId);
+
+        wallet.rsaPublicKey = CryptUtil.convertStringtoPublicKey(simpleWalletRecord.getPublicKey(),"RSA");
+        wallet.rsaPrivateKey = CryptUtil.convertStringtoPrivateKey(simpleWalletRecord.getPrivateKey(),"RSA");
+        wallet.rsaCertificate = CertUtil.getCertFromString(simpleWalletRecord.getCertificate());
+
+        return wallet;
+
+    }
+
 
     public void setRsaPublicKey(PublicKey rsaPublicKey) {
         this.rsaPublicKey = rsaPublicKey;
@@ -74,11 +99,19 @@ public class SimpleWallet {
         this.rsaCertificate = rsaCertificate;
     }
 
-    public void updateKeys()
+    public void setClaimId(String claimId)
     {
-        simpleWalletRecord.setCertificate(CertUtil.getCertAsString(rsaCertificate));
-        simpleWalletRecord.setPublicKey(CryptUtil.convertPublicKeyToString(rsaPublicKey));
-        simpleWalletRecord.setPrivateKey(CryptUtil.convertPrivateKeyToString(rsaPrivateKey));
+        this.claimId = claimId;
+    }
+
+    public static void updateKeys(SimpleWallet wallet)
+    {
+
+        SimpleWalletRecord simpleWalletRecord = new SimpleWalletRecord();
+        simpleWalletRecord.setCertificate(CertUtil.getCertAsString(wallet.rsaCertificate));
+        simpleWalletRecord.setPublicKey(CryptUtil.convertPublicKeyToString(wallet.rsaPublicKey));
+        simpleWalletRecord.setPrivateKey(CryptUtil.convertPrivateKeyToString(wallet.rsaPrivateKey));
+        simpleWalletRecord.setClaimId(wallet.claimId);
         mapper.save(simpleWalletRecord);
 
     }
@@ -100,37 +133,14 @@ public class SimpleWallet {
 
     public String getClaimId()
     {
-        return simpleWalletRecord.getClaimId();
+        return claimId;
     }
 
     public X509Certificate getRsaCertificate() {
         return rsaCertificate;
     }
 
-    public void updateClaimId(String claimId)
-    {
 
-
-        simpleWalletRecord.setClaimId(claimId);
-        mapper.save(simpleWalletRecord);
-
-
-    }
-
-
-
-
-
-
-
-
-
-
-    // send verify request and get claim id from the INO and update the record .
-
-    // retrieve record to get the claim and then send the claim for transacting .
-
-    // if claim has expired , then a new claimId will be generated - update the record with the new claim Id .
 
 
 
