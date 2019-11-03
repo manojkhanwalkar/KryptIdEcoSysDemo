@@ -8,6 +8,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.model.*;
 import data.SimpleWalletRecord;
+import javassist.Loader;
 import util.CertUtil;
 import util.CertificateCreator;
 import util.CryptUtil;
@@ -48,14 +49,10 @@ public class SimpleWallet {
     X509Certificate rsaCertificate;
 
 
-    private SimpleWallet()
+    static
     {
         ddb = getHandle();
         mapper = new DynamoDBMapper(ddb);
-
-     /*   simpleWalletRecord
-
-       */
 
 
     }
@@ -113,6 +110,20 @@ public class SimpleWallet {
         simpleWalletRecord.setPrivateKey(CryptUtil.convertPrivateKeyToString(wallet.rsaPrivateKey));
         simpleWalletRecord.setClaimId(wallet.claimId);
         mapper.save(simpleWalletRecord);
+
+    }
+
+    public static void deleteWalletKey(String claimId)
+    {
+        SimpleWalletRecord simpleWalletRecord =  mapper.load(SimpleWalletRecord.class, claimId);
+
+        if (simpleWalletRecord!=null)
+            mapper.delete(simpleWalletRecord);
+
+    }
+
+    public static void deleteWallet()
+    {
 
     }
 

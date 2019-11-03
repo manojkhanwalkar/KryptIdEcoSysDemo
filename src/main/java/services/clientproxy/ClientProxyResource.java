@@ -144,6 +144,61 @@ public class ClientProxyResource {
     }
 
 
+    @POST
+    @Timed
+    @Path("/deletewalletkey")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteWalletKey(String claimId) {
+
+         SimpleWallet.deleteWalletKey(claimId);
+
+         return "Wallet Key deleted" ;
+        // delete the record associated with this claim .
+
+    }
+
+    @GET
+    @Timed
+    @Path("/deletewallet")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteWallet() {
+
+        return null;
+
+        // delete all records in the wallet
+
+    }
+
+
+    @GET
+    @Timed
+    @Path("/deleteclaim")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteClaim(String claimId) {
+
+        return null;
+
+        // delete the record associated with this claim .
+
+    }
+
+    @POST
+    @Timed
+    @Path("/deleteclaims")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteAllClaims() {
+
+
+        // delete the record associated with this claim .
+        return null;
+
+    }
+
+
+
+
+
+
 
 
     //
