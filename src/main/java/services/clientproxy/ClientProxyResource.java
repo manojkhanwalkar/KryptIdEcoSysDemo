@@ -131,6 +131,22 @@ public class ClientProxyResource {
 
 
 
+    @GET
+    @Timed
+    @Path("/claimids")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ClaimIds claimids() {
+
+        INOConnector connector =  INOConnector.buildINOConnector();
+        return connector.getAllClaimIds();
+
+
+    }
+
+
+
+
+    //
 
 
 }
