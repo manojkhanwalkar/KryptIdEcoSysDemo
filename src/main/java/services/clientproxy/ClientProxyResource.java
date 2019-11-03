@@ -37,7 +37,36 @@ public class ClientProxyResource {
 
 
 
+    @POST
+    @Timed
+    @Path("/update")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String update(AddAttributeRequest addAttributeRequest) {
 
+        try {
+            INOConnector connector =  INOConnector.buildINOConnector();
+            TransactionNumber transactionNumber = new TransactionNumber();
+
+            transactionNumber.setTransactionId(addAttributeRequest.getClaimId());
+            VerifiedClaim claim=  connector.getClaim(transactionNumber);
+
+            VerifyRequest verifyRequest = connector.createNewRequest(addAttributeRequest,claim);
+
+             transactionNumber = connector.verify(verifyRequest);
+            return transactionNumber.getTransactionId();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
+        return "Update failed " ;
+
+
+
+    }
+
+//   {"claimId":"0d9e5eb0-6002-40e0-b7c9-789d19456f0e","attributes":{"LastName":"Also Changed","FirstName":"Changed"}}
 
 
 

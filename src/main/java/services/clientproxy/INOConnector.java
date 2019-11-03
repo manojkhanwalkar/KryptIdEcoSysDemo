@@ -12,6 +12,7 @@ import util.*;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
@@ -268,5 +269,56 @@ public static INOConnector buildINOConnector()
     }
 
 
+    public VerifyRequest createNewRequest(AddAttributeRequest addAttributeRequest, VerifiedClaim claim) {
 
+        MerkleTree tree = claim.getTree();
+
+        Identity identity = MerkleTreeUtil.getIdentityAttributes(tree);
+
+        System.out.println(identity);
+
+        // iterate over add attribute request and set it on identity
+
+        addAttributeRequest.getAttributes().entrySet().stream().forEach((entry)-> {
+
+            switch(entry.getKey())
+            {
+                case FirstName:
+                    identity.setFirstName(entry.getValue());
+                    break;
+                case LastName:
+                    identity.setLastName(entry.getValue());
+                    break;
+                case Zip:
+                    identity.setZip(entry.getValue());
+                    break;
+                case Address:
+                    identity.setAddress(entry.getValue());
+                    break;
+                case SSN:
+                    identity.setSsn(entry.getValue());
+                    break;
+                case Email:
+                    identity.setEmail(entry.getValue());
+                    break;
+                case BirthDate:
+                    identity.setBirthDate(LocalDate.parse(entry.getValue()));
+                    break;
+
+                default :
+                    System.out.println("Erroneous attribute " + entry);
+
+            }
+
+        });
+
+        // identity.setFirstName("Changed");
+
+        VerifyRequest request = new VerifyRequest();
+        request.setIdentity(identity);
+
+        return request;
+
+
+    }
 }
