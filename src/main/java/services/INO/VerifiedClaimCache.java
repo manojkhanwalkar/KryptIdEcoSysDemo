@@ -1,9 +1,11 @@
 package services.INO;
 
+import data.ClaimRecord;
 import data.EncryptedVerifiedClaim;
 import data.VerifiedClaim;
 import util.DHUtil;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,6 +29,11 @@ public class VerifiedClaimCache {
     {
 
         return manager.getClaim(transactionId);
+    }
+
+    public List<ClaimRecord> getAllClaimIds()
+    {
+        return manager.getAllClaimIds();
     }
 
     @Override

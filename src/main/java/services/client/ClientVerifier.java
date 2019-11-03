@@ -110,6 +110,11 @@ public class ClientVerifier {
         return connector.transact(claim);
     }
 
+    public ClaimIds getAllClaimIds()
+    {
+        return connector.getAllClaimIds();
+    }
+
 
     public TransactionNumber addAttribute(AddAttributeRequest addAttributeRequest)
     {
@@ -130,6 +135,14 @@ public class ClientVerifier {
 
 
         ClientVerifier verifier = new ClientVerifier();
+
+        ClaimIds claimIds = verifier.getAllClaimIds();
+
+        System.out.println(claimIds);
+
+        Thread.sleep(20000);
+
+
 
 
        // verifier.exchangeKeys();

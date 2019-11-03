@@ -9,6 +9,7 @@ import org.eclipse.jetty.util.ssl.X509;
 import util.*;
 
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -16,8 +17,11 @@ import javax.ws.rs.core.MediaType;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import static constants.Constants.FileLocation;
 import static util.ClaimValidator.*;
@@ -129,6 +133,43 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
 
     @POST
     @Timed
+    @Path("/list")
+    @Produces(MediaType.APPLICATION_JSON)
+    public EncryptedMessage list(EncryptedMessage request) {
+
+
+        keyExchangeManager.verify(request);
+        String requestStr = keyExchangeManager.decryptRequest(request);
+
+        // ignore the request as the function just has to return all claim id's . Get not used here to enable the sender to be verified.
+
+    //    VerifyRequest verifyRequest = (VerifyRequest) JSONUtil.fromJSON(requestStr,VerifyRequest.class);
+        System.out.println(requestStr);
+
+        //logManager.submit(verifyRequest);
+
+
+
+        List<String> ids = claimCache.getAllClaimIds().stream().map(claimRecord->claimRecord.getClaimId()).collect(Collectors.toList());
+
+        ClaimIds claimIds = new ClaimIds();
+
+        claimIds.setClaimsIds((ArrayList<String>)ids);
+
+
+        EncryptedMessage response =  keyExchangeManager.encryptResponse(JSONUtil.toJSON(claimIds),request);
+        keyExchangeManager.sign(response);
+        return response;
+
+
+
+    }
+
+
+
+
+    @POST
+    @Timed
     @Path("/claim")
     @Produces(MediaType.APPLICATION_JSON)
     public EncryptedMessage claim(EncryptedMessage request) {
@@ -157,50 +198,6 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
 
 
 
-/*
-
- @POST
-    @Timed
-    @Path("/claim")
-    @Produces(MediaType.APPLICATION_JSON)
-    public EncryptedMessage claim(EncryptedMessage request) {
-
-        // return IDVerificationManager.getInstance().verify(request);
-
-        keyExchangeManager.verify(request);
-
-
-        String requestStr = keyExchangeManager.decryptRequest(request);
-
-        VerifyRequest verifyRequest = (VerifyRequest) JSONUtil.fromJSON(requestStr,VerifyRequest.class);
-        System.out.println(verifyRequest);
-
-
-        VerifiedClaim claim = claimManager.verifyIdentityAndGenerateClaim(verifyRequest);
-
-        String claimStr = JSONUtil.toJSON(claim);
-
-
-        EncryptedVerifiedClaim encryptedVerifiedClaim = new EncryptedVerifiedClaim();
-
-        PublicKey rsaPublicKey = CryptUtil.convertStringtoPublicKey(verifyRequest.getRsaPublicKey(),"RSA");
-
-        SymKeyStringTuple tuple = CryptUtil.encrypt(claimStr,rsaPublicKey);
-
-        //TODO - encrypt the verifiedclaim with sym key derived from users rsa public key sent in the request.
-        encryptedVerifiedClaim.setVerifiedClaim(tuple.message);
-        encryptedVerifiedClaim.setEncryptedKey(tuple.key);
-
-        String responseStr = JSONUtil.toJSON(encryptedVerifiedClaim);
-        EncryptedMessage response =  keyExchangeManager.encryptResponse(responseStr,request);
-        keyExchangeManager.sign(response);
-        return response;
-
-
-
-    }
-
- */
 
 
 

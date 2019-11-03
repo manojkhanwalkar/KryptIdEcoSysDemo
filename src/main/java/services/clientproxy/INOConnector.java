@@ -321,4 +321,29 @@ public static INOConnector buildINOConnector()
 
 
     }
+
+    public ClaimIds getAllClaimIds() {
+
+
+        try {
+
+
+            String str = JSONUtil.toJSON("Dummy request string which will be ignored");
+
+            String response = ino.send(str,"list");
+
+            ClaimIds claimIds= (ClaimIds) JSONUtil.fromJSON(response,ClaimIds.class);
+
+
+
+            return claimIds;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+
+
+    }
 }
