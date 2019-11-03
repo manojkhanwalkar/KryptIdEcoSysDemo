@@ -6,6 +6,7 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.*;
 import data.SimpleWalletRecord;
 import javassist.Loader;
@@ -117,13 +118,22 @@ public class SimpleWallet {
     {
         SimpleWalletRecord simpleWalletRecord =  mapper.load(SimpleWalletRecord.class, claimId);
 
-        if (simpleWalletRecord!=null)
+        if (simpleWalletRecord!=null) {
+
             mapper.delete(simpleWalletRecord);
+            System.out.println("Deleted " + simpleWalletRecord);
+        }
 
     }
 
     public static void deleteWallet()
     {
+
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+        List<SimpleWalletRecord> walletRecords = mapper.scan(SimpleWalletRecord.class, scanExpression);
+
+        walletRecords.stream().map(record -> record.getClaimId()).forEach(id->deleteWalletKey(id));
+
 
     }
 

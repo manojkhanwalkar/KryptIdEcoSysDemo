@@ -163,7 +163,9 @@ public class ClientProxyResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String deleteWallet() {
 
-        return null;
+        SimpleWallet.deleteWallet();
+
+        return "Wallet  deleted" ;
 
         // delete all records in the wallet
 
