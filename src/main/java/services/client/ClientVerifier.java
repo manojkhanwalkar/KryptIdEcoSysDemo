@@ -116,6 +116,12 @@ public class ClientVerifier {
     }
 
 
+    public List<VerifiedClaim> getAllClaims()
+    {
+        return connector.getAllClaims();
+    }
+
+
     public TransactionNumber addAttribute(AddAttributeRequest addAttributeRequest)
     {
         /* get existing claim , create Identity object from that , add attributes to the identity object and create new verify request,  and return the claimId of the newly created claim
@@ -136,9 +142,10 @@ public class ClientVerifier {
 
         ClientVerifier verifier = new ClientVerifier();
 
-        ClaimIds claimIds = verifier.getAllClaimIds();
+        List<VerifiedClaim> verifiedClaims = verifier.getAllClaims();
 
-        System.out.println(claimIds);
+        System.out.println(verifiedClaims);
+
 
         Thread.sleep(20000);
 

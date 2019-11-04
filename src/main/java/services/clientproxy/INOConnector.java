@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static util.ClaimValidator.convert;
 import static util.ClaimValidator.isValidClaim;
@@ -120,12 +121,30 @@ public class INOConnector {
 
         String response = ino.send(str,"claim");
 
+        return getClaim(response,wallet.getRsaPrivateKey());
+
+    }
+
+    public VerifiedClaim getClaim(ClaimInfo claimInfo)
+    {
+
+        SimpleWallet wallet = SimpleWallet.getWallet(claimInfo.getClaimId());
+
+        String response = claimInfo.getEncryptedVerifiedClaimStr();
+
+        return getClaim(response,wallet.getRsaPrivateKey());
+
+
+    }
+
+    private VerifiedClaim getClaim(String response, PrivateKey privateKey)
+    {
         EncryptedVerifiedClaim encryptedVerifiedClaim = (EncryptedVerifiedClaim) JSONUtil.fromJSON(response,EncryptedVerifiedClaim.class);
 
         System.out.println("Received encrypted claim " + encryptedVerifiedClaim);
 
 
-        VerifiedClaim claim = convert(encryptedVerifiedClaim,wallet.getRsaPrivateKey());
+        VerifiedClaim claim = convert(encryptedVerifiedClaim,privateKey);
 
 
         isValidClaim(claim);
@@ -139,6 +158,7 @@ public class INOConnector {
         return claim;
 
     }
+
 
 
 
@@ -373,5 +393,21 @@ public static INOConnector buildINOConnector()
             e.printStackTrace();
         }
 
+    }
+
+    public List<VerifiedClaim> getAllClaims() {
+        try {
+            String response = ino.send("dummystring" , "claims");
+            Claims claims= (Claims) JSONUtil.fromJSON(response,Claims.class);
+            List<VerifiedClaim> verifiedClaims = claims.getClaims().stream().map(this::getClaim).collect(Collectors.toList());
+
+            return verifiedClaims;
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

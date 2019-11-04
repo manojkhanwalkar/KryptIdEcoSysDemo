@@ -1,6 +1,7 @@
 package services.INO;
 
 import data.ClaimRecord;
+import data.Claims;
 import data.EncryptedVerifiedClaim;
 import data.VerifiedClaim;
 import util.DHUtil;
@@ -29,6 +30,12 @@ public class VerifiedClaimCache {
     {
 
         return manager.getClaim(transactionId);
+    }
+
+
+    public Claims getAllClaims()
+    {
+        return manager.getAllClaims();
     }
 
     public List<ClaimRecord> getAllClaimIds()

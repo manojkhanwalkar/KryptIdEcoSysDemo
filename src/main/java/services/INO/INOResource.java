@@ -188,6 +188,27 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
 
     }
 
+    @POST
+    @Timed
+    @Path("/deleteclaims")
+    @Produces(MediaType.APPLICATION_JSON)
+    public EncryptedMessage deleteAllClaims(EncryptedMessage request) {
+
+
+        keyExchangeManager.verify(request);
+
+
+        claimCache.deleteClaims();
+
+
+        EncryptedMessage response =  keyExchangeManager.encryptResponse("Claim deleted",request);
+        keyExchangeManager.sign(response);
+        return response;
+
+
+
+    }
+
 
 
 
@@ -218,6 +239,31 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
 
 
     }
+
+    @POST
+    @Timed
+    @Path("/claims")
+    @Produces(MediaType.APPLICATION_JSON)
+    public EncryptedMessage claims(EncryptedMessage request) {
+
+        // return IDVerificationManager.getInstance().verify(request);
+
+        keyExchangeManager.verify(request);
+
+
+
+
+        Claims claims = claimCache.getAllClaims();
+
+        String responseStr = JSONUtil.toJSON(claims);
+        EncryptedMessage response =  keyExchangeManager.encryptResponse(responseStr,request);
+        keyExchangeManager.sign(response);
+        return response;
+
+
+
+    }
+
 
 
 

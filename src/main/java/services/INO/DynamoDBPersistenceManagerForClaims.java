@@ -7,10 +7,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import data.ClaimRecord;
-import data.EncryptedVerifiedClaim;
-import data.Identity;
-import data.VerifyRequest;
+import data.*;
 import util.CertUtil;
 import util.CryptUtil;
 import util.JSONUtil;
@@ -19,10 +16,7 @@ import util.SymKeyStringTuple;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DynamoDBPersistenceManagerForClaims {
@@ -123,6 +117,39 @@ public class DynamoDBPersistenceManagerForClaims {
             EncryptedVerifiedClaim encryptedVerifiedClaim = (EncryptedVerifiedClaim)JSONUtil.fromJSON(claimStr,EncryptedVerifiedClaim.class);
 
             return encryptedVerifiedClaim;
+    }
+
+
+    public Claims getAllClaims() {
+
+
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+        List<ClaimRecord> claimRecords = mapper.scan(ClaimRecord.class, scanExpression);
+
+        List<ClaimInfo> claimInfos = new ArrayList<>();
+        claimRecords.stream().forEach(claim->{
+            ClaimInfo claimInfo = new ClaimInfo();
+            String doubleEncryptedclaimStr =  claim.getDoubleEncryptedVerifiedClaimStr();
+            String encryptedKey = claim.getEncryptedKey();
+
+            String claimStr = CryptUtil.decrypt(doubleEncryptedclaimStr,encryptedKey,privateKey);
+
+            claimInfo.setClaimId(claim.getClaimId());
+            claimInfo.setEncryptedVerifiedClaimStr(claimStr);
+
+            claimInfos.add(claimInfo);
+
+//            EncryptedVerifiedClaim encryptedVerifiedClaim = (EncryptedVerifiedClaim)JSONUtil.fromJSON(claimStr,EncryptedVerifiedClaim.class);
+
+
+        });
+
+        Claims claims = new Claims();
+        claims.setClaims((ArrayList)claimInfos);
+
+        return claims;
+
+
     }
 
 

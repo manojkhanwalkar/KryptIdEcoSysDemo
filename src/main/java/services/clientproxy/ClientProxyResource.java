@@ -198,7 +198,7 @@ public class ClientProxyResource {
         INOConnector connector =  INOConnector.buildINOConnector();
         connector.deleteClaims();
 
-        return "All Claims have been deleted";
+        return "All ClaimInfo have been deleted";
 
 
     }
