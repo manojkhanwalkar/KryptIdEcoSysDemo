@@ -346,4 +346,32 @@ public static INOConnector buildINOConnector()
 
 
     }
+
+
+    public void deleteClaim(String claimId) {
+
+
+        try {
+
+            ino.send(claimId,"deleteclaim");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public void deleteClaims() {
+
+
+        try {
+
+            ino.send("dummy string ","deleteclaims");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 }

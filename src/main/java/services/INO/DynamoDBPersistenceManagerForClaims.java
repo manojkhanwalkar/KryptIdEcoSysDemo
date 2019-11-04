@@ -85,8 +85,29 @@ public class DynamoDBPersistenceManagerForClaims {
 
 
 
+    public void deleteClaim(String claimId)
+    {
+        ClaimRecord claim = mapper.load(ClaimRecord.class, claimId);
+        if (claim!=null)
+        {
+            mapper.delete(claim);
+            System.out.println("Deleted claim " + claim);
+        }
+
+    }
 
 
+    public void deleteClaims()
+    {
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+        List<ClaimRecord> claimRecords = mapper.scan(ClaimRecord.class, scanExpression);
+
+        claimRecords.stream().map(record->record.getClaimId()).forEach(id->{
+
+            deleteClaim(id);
+        });
+
+    }
 
 
     public EncryptedVerifiedClaim getClaim(String claimId)

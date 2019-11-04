@@ -36,6 +36,17 @@ public class VerifiedClaimCache {
         return manager.getAllClaimIds();
     }
 
+    public void deleteClaim(String claimId)
+    {
+        manager.deleteClaim(claimId);
+    }
+
+
+    public void deleteClaims()
+    {
+        manager.deleteClaims();
+    }
+
     @Override
     public String toString() {
         return "SessionKeyCache{" +

@@ -165,6 +165,29 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
 
     }
 
+    @POST
+    @Timed
+    @Path("/deleteclaim")
+    @Produces(MediaType.APPLICATION_JSON)
+    public EncryptedMessage deleteClaim(EncryptedMessage request) {
+
+
+        keyExchangeManager.verify(request);
+        String claimId = keyExchangeManager.decryptRequest(request);
+
+        System.out.println(claimId);
+
+        claimCache.deleteClaim(claimId);
+
+
+        EncryptedMessage response =  keyExchangeManager.encryptResponse("Claim deleted",request);
+        keyExchangeManager.sign(response);
+        return response;
+
+
+
+    }
+
 
 
 

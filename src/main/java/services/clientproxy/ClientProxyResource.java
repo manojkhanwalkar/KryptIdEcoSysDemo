@@ -172,27 +172,34 @@ public class ClientProxyResource {
     }
 
 
-    @GET
+    @POST
     @Timed
     @Path("/deleteclaim")
     @Produces(MediaType.APPLICATION_JSON)
     public String deleteClaim(String claimId) {
 
-        return null;
+        INOConnector connector =  INOConnector.buildINOConnector();
+         connector.deleteClaim(claimId);
+
+
+        return "Claim has been deleted";
 
         // delete the record associated with this claim .
 
     }
 
-    @POST
+    @GET
     @Timed
     @Path("/deleteclaims")
     @Produces(MediaType.APPLICATION_JSON)
     public String deleteAllClaims() {
 
 
-        // delete the record associated with this claim .
-        return null;
+        INOConnector connector =  INOConnector.buildINOConnector();
+        connector.deleteClaims();
+
+        return "All Claims have been deleted";
+
 
     }
 
