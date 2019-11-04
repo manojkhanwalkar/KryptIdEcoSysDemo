@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -203,14 +204,19 @@ public class ClientProxyResource {
 
     }
 
+    @GET
+    @Timed
+    @Path("/claims")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<VerifiedClaim> getAllClaims() {
 
 
+        INOConnector connector =  INOConnector.buildINOConnector();
 
+        return connector.getAllClaims();
 
+    }
 
-
-
-    //
 
 
 }
