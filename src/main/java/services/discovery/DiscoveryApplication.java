@@ -29,7 +29,7 @@ public class DiscoveryApplication extends Application<DiscoveryConfiguration> {
     public void run(DiscoveryConfiguration configuration,
                     Environment environment) {
 
-        serviceStatusCache = new ServiceStatusCache();
+        serviceStatusCache = ServiceStatusCache.getInstance();
         final DiscoveryResource resource = new DiscoveryResource(
                 configuration.getTemplate(),
                 configuration.getDefaultName(),

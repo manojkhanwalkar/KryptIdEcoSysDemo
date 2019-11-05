@@ -11,6 +11,21 @@ import java.util.stream.Collectors;
 
 public class ServiceStatusCache {
 
+    static class Holder
+    {
+        public static ServiceStatusCache serviceStatusCache = new ServiceStatusCache();
+    }
+
+    public static ServiceStatusCache getInstance()
+    {
+        return Holder.serviceStatusCache;
+    }
+
+
+    private ServiceStatusCache()
+    {
+
+    }
 
     List<CacheObserver> observers = new CopyOnWriteArrayList<>();
 
