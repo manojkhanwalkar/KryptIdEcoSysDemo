@@ -159,6 +159,7 @@ public class Connection {
         }
     }
 
+    static String HmacKey = "SecretKeyForHMACCalculation";   // in real life this will be taken from a secure location.
 
     private String post(String str , String url) throws Exception
     {
@@ -166,6 +167,7 @@ public class Connection {
         HttpRequest httprequest = HttpRequest.newBuilder()
                 .uri(URI.create(target + url))
                 .header("Content-Type", "application/json")
+                 .header("HMAC" , HMACUtil.calculateHMAC(str,HmacKey))
                 .POST(HttpRequest.BodyPublishers.ofString(str))
                 .timeout(Duration.ofMinutes(1))
                 .build();

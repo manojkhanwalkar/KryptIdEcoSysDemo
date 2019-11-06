@@ -13,7 +13,10 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -75,11 +78,36 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
 
     LogManager logManager = new LogManager();
 
+    static String HmacKey = "SecretKeyForHMACCalculation";   // in real life this will be taken from a secure location.
+
+
+
+    private boolean validateHMAC(String request, HttpHeaders headers)
+    {
+        String value = headers.getRequestHeader("HMAC").get(0);
+
+        String compute = HMACUtil.calculateHMAC(request, HmacKey);
+        if (value.equals(compute)) {
+            System.out.println("HMAC has been validated ");
+            return true;
+        }
+        else {
+            System.out.println("HAMC validation failed");
+
+            System.out.println("HMAC Received " + value);
+            System.out.println("HMAC Computed " + compute);
+            return false;
+        }
+
+    }
+
     @POST
     @Timed
     @Path("/verify")
     @Produces(MediaType.APPLICATION_JSON)
-    public EncryptedMessage verify(EncryptedMessage request) {
+    public EncryptedMessage verify(EncryptedMessage request, @Context HttpHeaders httpHeaders) {
+
+        validateHMAC(JSONUtil.toJSON(request),httpHeaders);
 
        // return IDVerificationManager.getInstance().verify(request);
 
