@@ -130,6 +130,11 @@ public class ClientVerifier {
         return null;
     }
 
+    public void getCBORNonce()
+    {
+          connector.getCBORNonce();
+    }
+
 
 
 
@@ -142,9 +147,11 @@ public class ClientVerifier {
 
         ClientVerifier verifier = new ClientVerifier();
 
-        List<VerifiedClaim> verifiedClaims = verifier.getAllClaims();
+        verifier.getCBORNonce();
 
-        System.out.println(verifiedClaims);
+       /* List<VerifiedClaim> verifiedClaims = verifier.getAllClaims();
+
+        System.out.println(verifiedClaims);*/
 
 
         Thread.sleep(20000);
@@ -188,7 +195,7 @@ public class ClientVerifier {
 
 //       for (int i=0;i<32;i++) {
 
-            AddAttributeRequest addAttributeRequest = new AddAttributeRequest();
+    /*        AddAttributeRequest addAttributeRequest = new AddAttributeRequest();
             addAttributeRequest.put(Identity.PIIAttributes.FirstName,"Changed");
         addAttributeRequest.put(Identity.PIIAttributes.LastName,"Also Changed");
 
@@ -259,7 +266,7 @@ public class ClientVerifier {
 
             //Thread.sleep(2000);
     //   }
-
+*/
 
 
 

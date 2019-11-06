@@ -1,10 +1,12 @@
 package services.client;
 
-import data.EncryptedMessage;
-import data.KeyExchange;
-import data.SignatureContainer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
+import data.*;
+import data.Identity;
 import util.*;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -249,8 +251,39 @@ public class Connection {
     }
 
 
+    public void sendCBOR(String url) {
+
+        try {
+            CBORFactory f = new CBORFactory();
+            ObjectMapper mapper = new ObjectMapper(f);
+
+            Identity identity = new Identity();
+            identity.setEmail("test@test.com");
+            identity.setAddress("Hello CBOR Street");
+            byte[] cborData = mapper.writeValueAsBytes(identity);
 
 
+            HttpRequest httprequest = HttpRequest.newBuilder()
+                    .uri(URI.create(target + url))
+                    .header("Content-Type", "*/*")
+
+                    .POST(HttpRequest.BodyPublishers.ofByteArray(cborData))
+                    .timeout(Duration.ofMinutes(1))
+                    .build();
+
+            HttpResponse<byte[]> response =
+                    client.send(httprequest, HttpResponse.BodyHandlers.ofByteArray());
 
 
+            Nonces nonces = mapper.readValue(response.body(), Nonces.class);
+
+            System.out.println(nonces);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 }

@@ -3,6 +3,9 @@ package services.INO;
 import blockchain.LogManager;
 import blockchain.TransactionManager;
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import constants.Constants;
 import data.*;
 import org.eclipse.jetty.util.ssl.X509;
@@ -191,6 +194,39 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
 
 
     }
+
+
+    @POST
+    @Timed
+    @Path("/nonce1")
+    @Produces(MediaType.WILDCARD)
+    public byte[] nonce1(byte[] bytes) {
+
+
+        try {
+            Nonces nonces = claimCache.getNonces();
+
+            CBORFactory f = new CBORFactory();
+            ObjectMapper mapper = new ObjectMapper(f);
+
+            Identity otherValue = mapper.readValue(bytes, Identity.class);
+
+            System.out.println(otherValue);
+
+
+            byte[] cborData = mapper.writeValueAsBytes(nonces);
+
+            return cborData;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+
+    }
+
+
 
 
     @POST

@@ -423,4 +423,10 @@ public static INOConnector buildINOConnector()
 
         return null;
     }
+
+    public void getCBORNonce() {
+
+        ino.sendCBOR("nonce1");
+
+    }
 }
