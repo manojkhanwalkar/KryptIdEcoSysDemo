@@ -1,6 +1,7 @@
 package util;
 
 import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.security.*;
@@ -118,6 +119,7 @@ public class CryptUtil {
         return null;
     }
 
+    static SecureRandom secureRandom = new SecureRandom();
 
     public static SymKeyStringTuple encrypt(String message, PublicKey key)
     {
@@ -156,7 +158,43 @@ public class CryptUtil {
         return null;
     }
 
-  public static String decrypt(String message, String key, PrivateKey privateKey)  {
+/*
+    public static SymKeyStringTuple encryptWithIV(String message, PublicKey key)
+    {
+        try {
+
+            byte[] iv = new byte[128/8];
+            secureRandom.nextBytes(iv);
+
+
+            KeyGenerator generator = KeyGenerator.getInstance("AES");
+            generator.init(128); // The AES key size in number of bits
+            SecretKey secKey = generator.generateKey();
+
+            Cipher cipher =  Cipher.getInstance("AES");
+
+            IvParameterSpec ivSpec=new IvParameterSpec(Base64.getDecoder().decode(iv));
+            cipher.init(Cipher.ENCRYPT_MODE, secKey,ivSpec);
+            String encryptedMessage = Base64.getEncoder().encodeToString(cipher.doFinal(message.getBytes("UTF-8")));
+
+            Cipher cipher1 = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+            cipher1.init(Cipher.PUBLIC_KEY, key);
+            String encryptedKey = Base64.getEncoder().encodeToString(cipher1.doFinal(secKey.getEncoded()));
+
+            SymKeyStringTuple tuple = new SymKeyStringTuple();
+            tuple.key = encryptedKey;
+            tuple.message= encryptedMessage;
+
+            return tuple;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }*/
+
+
+    public static String decrypt(String message, String key, PrivateKey privateKey)  {
 
       try {
           Cipher cipher = Cipher.getInstance("RSA");

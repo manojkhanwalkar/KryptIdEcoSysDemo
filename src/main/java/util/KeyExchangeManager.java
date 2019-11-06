@@ -10,6 +10,9 @@ import java.io.UnsupportedEncodingException;
 import java.security.*;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Base64;
+
+import static util.CryptUtil.secureRandom;
 
 public class KeyExchangeManager {
 
@@ -79,6 +82,7 @@ public class KeyExchangeManager {
     public EncryptedMessage encryptResponse(String response, EncryptedMessage request)
     {
         DHUtil util = sessionKeyCache.get(request.getClientId());
+
         return encrypt(response,util);
 
     }
@@ -86,7 +90,7 @@ public class KeyExchangeManager {
 
     private String decrypt(EncryptedMessage request, DHUtil util)
     {
-        return util.decrypt(request.getMessage());
+        return util.decrypt(request.getMessage(),request.getIv());
 
 
 
@@ -94,9 +98,13 @@ public class KeyExchangeManager {
 
     private EncryptedMessage encrypt(String str, DHUtil util)
     {
-        String estr = util.encrypt(str);
+        byte[] iv = new byte[128/8];
+        secureRandom.nextBytes(iv);
+
+        String estr = util.encrypt(str,iv);
         EncryptedMessage message = new EncryptedMessage();
         message.setMessage(estr);
+        message.setIv(Base64.getEncoder().encodeToString(iv));
         return message;
     }
 

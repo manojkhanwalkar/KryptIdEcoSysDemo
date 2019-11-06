@@ -36,5 +36,17 @@ public class EncryptedMessage {
     public void setContainer(SignatureContainer container) {
         this.container = container;
     }
-    
+
+
+   String iv;
+
+
+    @JsonProperty
+    public String getIv() {
+        return iv;
+    }
+
+    public void setIv(String iv) {
+        this.iv = iv;
+    }
 }

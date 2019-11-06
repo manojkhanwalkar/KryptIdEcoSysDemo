@@ -14,6 +14,7 @@ import java.security.*;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -85,14 +86,21 @@ public class Connection {
         return post(request,action);
     }
 
+    static SecureRandom secureRandom = new SecureRandom();
+
+
     public String send(String request, String action) throws Exception
     {
-        String encMessage = util.encrypt(request);
+        byte[] iv = new byte[128/8];
+        secureRandom.nextBytes(iv);
+
+        String encMessage = util.encrypt(request,iv);
 
 
         EncryptedMessage encryptedMessage = new EncryptedMessage();
         encryptedMessage.setMessage(encMessage);
         encryptedMessage.setClientId(clientId);
+        encryptedMessage.setIv(Base64.getEncoder().encodeToString(iv));
 
         sign(encryptedMessage,encMessage);
 
@@ -104,7 +112,7 @@ public class Connection {
 
         verify(encryptedMessage);
 
-        String decMessage = util.decrypt(encryptedMessage.getMessage());
+        String decMessage = util.decrypt(encryptedMessage.getMessage(),encryptedMessage.getIv());
 
         return decMessage;
 

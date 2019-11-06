@@ -4,6 +4,7 @@ package util;
 
 
 import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
 import java.security.*;
@@ -21,7 +22,9 @@ public class DHUtil {
     KeyAgreement keyAgreement;
     byte[] sharedsecret;
 
-    String ALGO = "AES";
+   // String ALGO = "AES";
+
+    String ALGO = "AES/CBC/PKCS5Padding";
 
     //CertUtil  util = new CertUtil();
 
@@ -60,26 +63,29 @@ public class DHUtil {
     }
 
 
-    public  String encrypt(String msg) {
+    public  String encrypt(String msg, byte[] iv) {
         try {
+            IvParameterSpec ivSpec=new IvParameterSpec(iv);
+
             Cipher c = Cipher.getInstance(ALGO);
-            c.init(Cipher.ENCRYPT_MODE, sessionKey);
+            c.init(Cipher.ENCRYPT_MODE, sessionKey, ivSpec);
             byte[] encVal = c.doFinal(msg.getBytes());
             return new String(Base64.getEncoder().encode(encVal));
-        } catch (BadPaddingException | InvalidKeyException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException e) {
+        } catch (Exception  e) {
             e.printStackTrace();
         }
         return msg;
     }
 
-    public  String decrypt(String encryptedData) {
+    public  String decrypt(String encryptedData, String iv) {
         try {
+            IvParameterSpec ivSpec=new IvParameterSpec(Base64.getDecoder().decode(iv));
             Cipher c = Cipher.getInstance(ALGO);
-            c.init(Cipher.DECRYPT_MODE, sessionKey);
+            c.init(Cipher.DECRYPT_MODE, sessionKey,ivSpec);
             byte[] decordedValue = Base64.getDecoder().decode(encryptedData);
             byte[] decValue = c.doFinal(decordedValue);
             return new String(decValue);
-        } catch (BadPaddingException | InvalidKeyException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return encryptedData;
@@ -94,7 +100,7 @@ public class DHUtil {
 
 //        return new SecretKeySpec(sharedsecret, ALGO);
 
-          return new SecretKeySpec(derivKey(), ALGO);
+          return new SecretKeySpec(derivKey(), "AES");
 
     }
 
