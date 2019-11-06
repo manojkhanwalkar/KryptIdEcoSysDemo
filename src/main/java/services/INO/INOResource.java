@@ -119,6 +119,10 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
         VerifyRequest verifyRequest = (VerifyRequest) JSONUtil.fromJSON(requestStr,VerifyRequest.class);
         System.out.println(verifyRequest);
 
+        boolean nonceVerified = claimCache.verifyNonce(verifyRequest.getNonce());
+
+        System.out.println("Valid Nonce received " + nonceVerified);
+
         //logManager.submit(verifyRequest);
 
 
@@ -151,6 +155,36 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
 
 
         EncryptedMessage response =  keyExchangeManager.encryptResponse(transactionNumberStr,request);
+        keyExchangeManager.sign(response);
+        return response;
+
+
+
+    }
+
+
+    @POST
+    @Timed
+    @Path("/nonce")
+    @Produces(MediaType.APPLICATION_JSON)
+    public EncryptedMessage nonce(EncryptedMessage request) {
+
+
+        keyExchangeManager.verify(request);
+        String requestStr = keyExchangeManager.decryptRequest(request);
+
+        // ignore the request as the function just has to return all claim id's . Get not used here to enable the sender to be verified.
+
+        //    VerifyRequest verifyRequest = (VerifyRequest) JSONUtil.fromJSON(requestStr,VerifyRequest.class);
+        System.out.println(requestStr);
+
+        //logManager.submit(verifyRequest);
+
+        Nonces nonces = claimCache.getNonces();
+
+
+
+        EncryptedMessage response =  keyExchangeManager.encryptResponse(JSONUtil.toJSON(nonces),request);
         keyExchangeManager.sign(response);
         return response;
 

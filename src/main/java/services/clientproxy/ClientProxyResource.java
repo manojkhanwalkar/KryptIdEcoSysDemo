@@ -70,6 +70,7 @@ public class ClientProxyResource {
 //   {"claimId":"0d9e5eb0-6002-40e0-b7c9-789d19456f0e","attributes":{"LastName":"Also Changed","FirstName":"Changed"}}
 
 
+NonceCache nonceCache = new NonceCache();
 
     @POST
     @Timed
@@ -77,8 +78,14 @@ public class ClientProxyResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String verify(VerifyRequest verifyRequest) {
 
+        Nonce nonce = nonceCache.get();
+
+        verifyRequest.setNonce(nonce);
+
 
         INOConnector connector =  INOConnector.buildINOConnector();
+
+
 
       //  VerifyRequest verifyRequest = INOConnector.makeSampleRequest();
         TransactionNumber transactionNumber = connector.verify(verifyRequest);

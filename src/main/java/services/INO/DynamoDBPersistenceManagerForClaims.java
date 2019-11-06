@@ -164,5 +164,50 @@ public class DynamoDBPersistenceManagerForClaims {
 
 
     }
+
+    public Nonces getNonces() {
+
+        // create N nonces , save them to db and return them .
+
+        ArrayList<Nonce> nonceList = new ArrayList<>();
+
+        for (int i=0;i<1;i++)
+        {
+            NonceRecord nonceRecord = new NonceRecord();
+            nonceRecord.setNonce(UUID.randomUUID().toString());
+            mapper.save(nonceRecord);
+            nonceList.add(new Nonce(nonceRecord.getNonce()));
+        }
+
+        Nonces nonces = new Nonces();
+        nonces.setNonces(nonceList);
+
+        return nonces;
+    }
+
+    public void deleteNonce(Nonce nonce)
+    {
+        // delete the nonce sent from db
+        NonceRecord nonceRecord = mapper.load(NonceRecord.class,nonce.getNonce());
+
+        mapper.delete(nonceRecord);
+
+    }
+
+    public boolean verifyNonce(Nonce nonce) {
+        NonceRecord nonceRecord = mapper.load(NonceRecord.class,nonce.getNonce());
+        if (nonceRecord==null)
+        {
+            System.out.println("Nonce not found " + nonce.getNonce());
+            return false;
+        }
+        else
+        {
+            mapper.delete(nonceRecord);
+            return true;
+        }
+
+
+    }
 }
 

@@ -1,9 +1,6 @@
 package services.INO;
 
-import data.ClaimRecord;
-import data.Claims;
-import data.EncryptedVerifiedClaim;
-import data.VerifiedClaim;
+import data.*;
 import util.DHUtil;
 
 import java.util.List;
@@ -59,5 +56,15 @@ public class VerifiedClaimCache {
         return "SessionKeyCache{" +
                 "cache=" + cache +
                 '}';
+    }
+
+    public Nonces getNonces() {
+
+        return manager.getNonces();
+    }
+
+    public boolean verifyNonce(Nonce nonce) {
+
+        return manager.verifyNonce(nonce);
     }
 }

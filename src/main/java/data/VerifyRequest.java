@@ -33,4 +33,14 @@ public class VerifyRequest {
     public void setRsaCert(String rsaCert) {
         this.rsaCert = rsaCert;
     }
+
+    Nonce nonce;
+
+    public Nonce getNonce() {
+        return nonce;
+    }
+
+    public void setNonce(Nonce nonce) {
+        this.nonce = nonce;
+    }
 }

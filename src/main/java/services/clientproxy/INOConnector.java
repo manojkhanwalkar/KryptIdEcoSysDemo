@@ -410,4 +410,17 @@ public static INOConnector buildINOConnector()
 
         return null;
     }
+
+    public Nonces getNonces() {
+
+        try {
+            String response = ino.send("dummystring" , "nonce");
+            Nonces nonces = (Nonces) JSONUtil.fromJSON(response,Nonces.class);
+            return nonces;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }
