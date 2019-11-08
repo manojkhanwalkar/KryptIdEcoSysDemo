@@ -198,6 +198,38 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
 
     @POST
     @Timed
+    @Path("/nonce2")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JavaWebEncryptedMessage nonce2(JavaWebEncryptedMessage request) {
+
+
+        keyExchangeManager.verify(request);
+
+        String requestStr = keyExchangeManager.decryptRequest(request);
+
+        // ignore the request as the function just has to return all claim id's . Get not used here to enable the sender to be verified.
+
+        //    VerifyRequest verifyRequest = (VerifyRequest) JSONUtil.fromJSON(requestStr,VerifyRequest.class);
+        System.out.println(requestStr);
+
+        //logManager.submit(verifyRequest);
+
+        Nonces nonces = claimCache.getNonces();
+
+
+
+        JavaWebEncryptedMessage response =  keyExchangeManager.encryptResponse(JSONUtil.toJSON(nonces),request);
+        keyExchangeManager.sign(response);
+        return response;
+
+
+
+    }
+
+
+
+    @POST
+    @Timed
     @Path("/nonce1")
     @Produces(MediaType.WILDCARD)
     public byte[] nonce1(byte[] bytes) {

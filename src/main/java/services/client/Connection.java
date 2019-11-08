@@ -121,6 +121,27 @@ public class Connection {
     }
 
 
+    private void sign(JavaWebEncryptedMessage encryptedMessage, String messageToSign)
+    {
+        try {
+            SignatureContainer obj = digiSig.sign(messageToSign);
+
+            encryptedMessage.setContainer(obj);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
     private void sign(EncryptedMessage encryptedMessage, String messageToSign)
     {
         try {
@@ -132,6 +153,29 @@ public class Connection {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private void verify(JavaWebEncryptedMessage encryptedMessage)
+    {
+        try {
+            boolean verify =  verifySig.verify(encryptedMessage.getContainer(),encryptedMessage.getMessage());
+            System.out.println("Message signature has been verified " + verify);
+
+
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
             e.printStackTrace();
         } catch (InvalidKeyException e) {
             e.printStackTrace();
@@ -291,6 +335,42 @@ public class Connection {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+
+    }
+
+    public void sendJWE() {
+
+        String request = "Dummy Payload";
+
+        String encMessage = util.encryptJWE(request);
+
+
+        JavaWebEncryptedMessage encryptedMessage = new JavaWebEncryptedMessage();
+        encryptedMessage.setMessage(encMessage);
+        encryptedMessage.setClientId(clientId);
+
+        sign(encryptedMessage,encMessage);
+
+        String encryptedResponseStr = null;
+        try {
+            encryptedResponseStr = post(JSONUtil.toJSON(encryptedMessage),"nonce2");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        encryptedMessage = (JavaWebEncryptedMessage)JSONUtil.fromJSON(encryptedResponseStr,JavaWebEncryptedMessage.class);
+
+        //  System.out.println("Encrypted claim received " + encryptedMessage.getMessage());
+
+        verify(encryptedMessage);
+
+        String decMessage = util.decryptJWE(encryptedMessage.getMessage());
+
+
+        System.out.println(decMessage);
+
+
 
 
     }

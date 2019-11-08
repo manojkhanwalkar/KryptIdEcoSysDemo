@@ -429,4 +429,8 @@ public static INOConnector buildINOConnector()
         ino.sendCBOR("nonce1");
 
     }
+
+    public void getNonceUsingJWE() {
+        ino.sendJWE();
+    }
 }

@@ -136,6 +136,10 @@ public class ClientVerifier {
     }
 
 
+    private void getNonceusingJWE() {
+
+        connector.getNonceUsingJWE();
+    }
 
 
 
@@ -147,14 +151,16 @@ public class ClientVerifier {
 
         ClientVerifier verifier = new ClientVerifier();
 
-        verifier.getCBORNonce();
+        verifier.getNonceusingJWE();
+
+       // verifier.getCBORNonce();
 
        /* List<VerifiedClaim> verifiedClaims = verifier.getAllClaims();
 
         System.out.println(verifiedClaims);*/
 
 
-        Thread.sleep(20000);
+        Thread.sleep(200000);
 
 
 
@@ -271,6 +277,7 @@ public class ClientVerifier {
 
 
     }
+
 
 
     private static boolean isValid(VerifiedClaim claim)

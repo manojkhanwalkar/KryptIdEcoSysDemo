@@ -2,10 +2,7 @@ package util;
 
 
 import cache.SessionKeyCache;
-import data.EncryptedMessage;
-import data.JavaWebSignatureContainer;
-import data.KeyExchange;
-import data.SignatureContainer;
+import data.*;
 
 import java.io.UnsupportedEncodingException;
 import java.security.*;
@@ -80,11 +77,27 @@ public class KeyExchangeManager {
         return decrypt(request,util);
     }
 
+
+    public String decryptRequest(JavaWebEncryptedMessage request)
+    {
+        DHUtil util = sessionKeyCache.get(request.getClientId());
+        return decrypt(request,util);
+    }
+
+
     public EncryptedMessage encryptResponse(String response, EncryptedMessage request)
     {
         DHUtil util = sessionKeyCache.get(request.getClientId());
 
         return encrypt(response,util);
+
+    }
+
+    public JavaWebEncryptedMessage encryptResponse(String response, JavaWebEncryptedMessage request)
+    {
+        DHUtil util = sessionKeyCache.get(request.getClientId());
+
+        return encryptJWE(response,util);
 
     }
 
@@ -97,6 +110,23 @@ public class KeyExchangeManager {
 
     }
 
+    private String decrypt(JavaWebEncryptedMessage request, DHUtil util)
+    {
+        return util.decryptJWE(request.getMessage());
+
+
+
+    }
+
+    private JavaWebEncryptedMessage encryptJWE(String str, DHUtil util)
+    {
+
+        String estr = util.encryptJWE(str);
+        JavaWebEncryptedMessage message = new JavaWebEncryptedMessage();
+        message.setMessage(estr);
+        return message;
+    }
+
     private EncryptedMessage encrypt(String str, DHUtil util)
     {
         byte[] iv = new byte[128/8];
@@ -107,6 +137,31 @@ public class KeyExchangeManager {
         message.setMessage(estr);
         message.setIv(Base64.getEncoder().encodeToString(iv));
         return message;
+    }
+
+
+    public boolean verify(JavaWebEncryptedMessage encryptedMessage) {
+        try {
+            boolean verify =  verifySig.verify(encryptedMessage.getContainer(),encryptedMessage.getMessage());
+
+
+
+            return true;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+
+
     }
 
 
@@ -145,6 +200,31 @@ public class KeyExchangeManager {
 
             JavaWebSignatureContainer obj1 = digiSig.jwsSign(message.getMessage());
             message.setJwsContainer(obj1);
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+
+    public void sign(JavaWebEncryptedMessage message) {
+
+
+        try {
+            SignatureContainer obj = digiSig.sign(message.getMessage());
+
+            message.setContainer(obj);
+
 
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
