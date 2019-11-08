@@ -125,8 +125,10 @@ public class Connection {
     {
         try {
             SignatureContainer obj = digiSig.sign(messageToSign);
+            JavaWebSignatureContainer obj1 = digiSig.jwsSign(messageToSign);
 
             encryptedMessage.setContainer(obj);
+            encryptedMessage.setJwsContainer(obj1);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (InvalidAlgorithmParameterException e) {
@@ -146,8 +148,14 @@ public class Connection {
     {
         try {
             boolean verify =  verifySig.verify(encryptedMessage.getContainer(),encryptedMessage.getMessage());
+             System.out.println("Message signature has been verified " + verify);
 
-            System.out.println("Message signature has been verified " + verify);
+             verify =  verifySig.verifyJWS(encryptedMessage.getJwsContainer(),encryptedMessage.getMessage());
+
+            System.out.println("Message JWS signature has been verified " + verify);
+
+
+
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (InvalidKeySpecException e) {

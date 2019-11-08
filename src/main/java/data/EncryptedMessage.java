@@ -27,6 +27,16 @@ public class EncryptedMessage {
 
      SignatureContainer container;
 
+    @JsonProperty
+    JavaWebSignatureContainer jwsContainer;
+
+    public JavaWebSignatureContainer getJwsContainer() {
+        return jwsContainer;
+    }
+
+    public void setJwsContainer(JavaWebSignatureContainer jwsContainer) {
+        this.jwsContainer = jwsContainer;
+    }
 
     @JsonProperty
     public SignatureContainer getContainer() {

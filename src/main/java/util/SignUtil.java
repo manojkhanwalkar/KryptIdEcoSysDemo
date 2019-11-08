@@ -1,6 +1,11 @@
 package util;
 
+import data.JavaWebSignatureContainer;
 import data.SignatureContainer;
+import org.jose4j.jwa.AlgorithmConstraints;
+import org.jose4j.jws.AlgorithmIdentifiers;
+import org.jose4j.jws.JsonWebSignature;
+import org.jose4j.lang.JoseException;
 
 import java.io.UnsupportedEncodingException;
 import java.security.*;
@@ -70,6 +75,26 @@ public class SignUtil {
         return signatureContainer;
     }
 
+    public JavaWebSignatureContainer jwsSign(String messageToSign) {
+        JavaWebSignatureContainer signatureContainer = new JavaWebSignatureContainer();
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setPayload(messageToSign);
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256);
+        jws.setKey(privateKey);
+        String jwsCompactSerialization = null;
+        try {
+            jwsCompactSerialization = jws.getCompactSerialization();
+        } catch (JoseException e) {
+            e.printStackTrace();
+        }
+        signatureContainer.setCertStr(certStr);
+        signatureContainer.setSignature(jwsCompactSerialization);
+
+        return signatureContainer;
+
+    }
+
+
     public synchronized boolean  verify(SignatureContainer signatureContainer, String message) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, UnsupportedEncodingException, SignatureException {
 
        Signature ecdsaVerify = Signature.getInstance(signatureContainer.getAlgorithm());
@@ -92,11 +117,30 @@ public class SignUtil {
     }
 
 
+    public boolean verifyJWS(JavaWebSignatureContainer jwsContainer, String message) {
+        PublicKey publicKey = CertUtil.getCertFromString(jwsContainer.getCertStr()).getPublicKey();
+
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setAlgorithmConstraints(new org.jose4j.jwa.AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256));
+        boolean signatureVerified = false;
+        try {
+            jws.setCompactSerialization(message);
+            jws.setKey(publicKey);
+            signatureVerified = jws.verifySignature();
+        } catch (JoseException e) {
+            e.printStackTrace();
+        }
+        System.out.println("JWS Signature is valid: " + signatureVerified);
+
+        return signatureVerified;
+
+      /*  String payload = jws.getPayload();
+        System.out.println("JWS payload: " + payload); */
 
 
 
 
-
+    }
 }
 
 
