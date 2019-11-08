@@ -150,7 +150,7 @@ public class Connection {
             boolean verify =  verifySig.verify(encryptedMessage.getContainer(),encryptedMessage.getMessage());
              System.out.println("Message signature has been verified " + verify);
 
-             verify =  verifySig.verifyJWS(encryptedMessage.getJwsContainer(),encryptedMessage.getMessage());
+             verify =  verifySig.verifyJWS(encryptedMessage.getJwsContainer());
 
             System.out.println("Message JWS signature has been verified " + verify);
 

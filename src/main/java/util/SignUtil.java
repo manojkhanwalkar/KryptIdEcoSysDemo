@@ -84,6 +84,8 @@ public class SignUtil {
         String jwsCompactSerialization = null;
         try {
             jwsCompactSerialization = jws.getCompactSerialization();
+
+            System.out.println(jwsCompactSerialization);
         } catch (JoseException e) {
             e.printStackTrace();
         }
@@ -117,14 +119,16 @@ public class SignUtil {
     }
 
 
-    public boolean verifyJWS(JavaWebSignatureContainer jwsContainer, String message) {
+    public boolean verifyJWS(JavaWebSignatureContainer jwsContainer) {
         PublicKey publicKey = CertUtil.getCertFromString(jwsContainer.getCertStr()).getPublicKey();
 
         JsonWebSignature jws = new JsonWebSignature();
         jws.setAlgorithmConstraints(new org.jose4j.jwa.AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256));
         boolean signatureVerified = false;
         try {
-            jws.setCompactSerialization(message);
+
+
+            jws.setCompactSerialization(jwsContainer.getSignature());
             jws.setKey(publicKey);
             signatureVerified = jws.verifySignature();
         } catch (JoseException e) {

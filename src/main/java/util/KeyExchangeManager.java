@@ -3,6 +3,7 @@ package util;
 
 import cache.SessionKeyCache;
 import data.EncryptedMessage;
+import data.JavaWebSignatureContainer;
 import data.KeyExchange;
 import data.SignatureContainer;
 
@@ -113,6 +114,8 @@ public class KeyExchangeManager {
         try {
             boolean verify =  verifySig.verify(encryptedMessage.getContainer(),encryptedMessage.getMessage());
 
+            verify = verifySig.verifyJWS(encryptedMessage.getJwsContainer());
+
             return true;
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -139,6 +142,10 @@ public class KeyExchangeManager {
             SignatureContainer obj = digiSig.sign(message.getMessage());
 
             message.setContainer(obj);
+
+            JavaWebSignatureContainer obj1 = digiSig.jwsSign(message.getMessage());
+            message.setJwsContainer(obj1);
+
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (InvalidAlgorithmParameterException e) {
