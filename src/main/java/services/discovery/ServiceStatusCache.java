@@ -45,6 +45,8 @@ public class ServiceStatusCache {
 
     public synchronized void register(ServiceInfo serviceInfo)
     {
+        System.out.println("Registering service " + serviceInfo);
+
         ServiceStatus serviceStatus = serviceStatusMap.get(serviceInfo.getServiceType());
         if (serviceStatus==null)
         {
@@ -59,10 +61,14 @@ public class ServiceStatusCache {
         updateObservers("Registered service " + JSONUtil.toJSON(serviceInfo));
 
 
+        System.out.println("Service status after registration " + serviceStatusMap);
+
+
     }
 
     public synchronized void deregister(ServiceInfo serviceInfo)
     {
+        System.out.println("Deregistering service " + serviceInfo);
         ServiceStatus serviceStatus = serviceStatusMap.get(serviceInfo.getServiceType());
         if (serviceStatus!=null)
         {
@@ -72,8 +78,10 @@ public class ServiceStatusCache {
 
         updateObservers("De-registered service " + JSONUtil.toJSON(serviceInfo));
 
+        System.out.println("Service status after deregistration " + serviceStatusMap);
     }
 
+    //TODO - deep clone the map before returning
 
     public synchronized HashMap<String, ServiceStatus> getServiceStatusMap()
     {

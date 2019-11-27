@@ -83,7 +83,6 @@ public class BureauResource {
     }
 
 
-    Random random = new Random();
 
 
     @POST
@@ -109,16 +108,9 @@ public class BureauResource {
 
 
 
+        CreditManager creditManager = CreditManager.getInstance();
+        CreditScore creditScore = creditManager.getCreditScore();
 
-   /*     VerifiedClaim claim = (VerifiedClaim) JSONUtil.fromJSON(requestStr,VerifiedClaim.class);
-
-        isValidClaim(claim);
-
-        System.out.println(claim);*/
-      //  System.out.println(requestStr);
-
-        CreditScore creditScore = new CreditScore();
-        creditScore.setScore(random.nextInt(300) + 500);
 
         String responseStr = JSONUtil.toJSON(creditScore);
         EncryptedMessage response =  keyExchangeManager.encryptResponse(responseStr,request);

@@ -11,21 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionKeyCache {
 
- /*   static class SessionKeyCacheHolder
-    {
-         static SessionKeyCache instance = new SessionKeyCache();
-    }
 
-
-
-    private SessionKeyCache()
-    {
-
-    }
-    public static SessionKeyCache getInstance()
-    {
-        return SessionKeyCacheHolder.instance;
-    }*/
 
     Map<String, DHUtil> cache = new ConcurrentHashMap<>();
 
