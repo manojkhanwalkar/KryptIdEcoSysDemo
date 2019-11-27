@@ -63,12 +63,7 @@ public class SPResource {
 
         rsaKeyHolder = new RSAKeyHolder(rsaCertFile,rsaPrivateFile);
 
-      /*  bureau = new Connection(bureauURL,publicKey,privateKey);
-        try {
-            bureau.connect();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } */
+
     }
 
     @POST

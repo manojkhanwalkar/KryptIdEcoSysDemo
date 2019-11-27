@@ -15,6 +15,7 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Random;
 
 import static data.Identity.PIIAttributes;
 
@@ -26,6 +27,18 @@ public abstract class INOMock {
     VerifiedClaimSignUtil verifiedClaimSignUtil ;
 
 
+    Random workDelay = new Random();
+
+
+    protected void simulateWorkViaRandomDelay()
+    {
+        int delay = workDelay.nextInt(5);
+        try {
+            Thread.sleep(delay*1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     public INOMock(String certFile1, String privateFile1) {

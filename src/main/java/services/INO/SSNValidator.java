@@ -25,6 +25,7 @@ public class SSNValidator extends INOMock {
     public VerifiedClaim verifyIdentityAndGenerateClaim(VerifyRequest request)
     {
 
+        simulateWorkViaRandomDelay();
         Identity identity = request.getIdentity();
 
         AttributeNode attribNode1 = new AttributeNode();

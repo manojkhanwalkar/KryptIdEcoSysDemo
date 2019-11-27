@@ -24,6 +24,7 @@ public class EmailValidator extends INOMock {
 
     public VerifiedClaim verifyIdentityAndGenerateClaim(VerifyRequest request)
     {
+        simulateWorkViaRandomDelay();
 
         Identity identity = request.getIdentity();
 

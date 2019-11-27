@@ -24,6 +24,7 @@ public class NameValidator extends INOMock {
     public VerifiedClaim verifyIdentityAndGenerateClaim(VerifyRequest request)
     {
 
+        simulateWorkViaRandomDelay();
         Identity identity = request.getIdentity();
 
         List<AttributeNode> attributeNodes = new ArrayList<>();
