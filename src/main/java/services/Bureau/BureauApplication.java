@@ -36,6 +36,9 @@ public class BureauApplication extends Application<BureauConfiguration> {
         DiscoveryLifeCycle myManagedObject = new DiscoveryLifeCycle(Constants.BureauServiceUrl,Constants.BureauServiceType, Constants.BureauServiceHealthUrl);
         environment.lifecycle().manage(myManagedObject);
 
+        CreditManagerFactory creditManagerFactory = CreditManagerFactory.getInstance();
+        creditManagerFactory.init();
+
         environment.jersey().register(resource);
         environment.healthChecks().register("APIHealthCheck", new AppHealthCheck());
 

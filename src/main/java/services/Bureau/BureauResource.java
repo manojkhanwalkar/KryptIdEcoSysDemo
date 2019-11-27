@@ -106,13 +106,22 @@ public class BureauResource {
 
         System.out.println(claim);
 
+        CombinedCreditScore combinedCreditScore = new CombinedCreditScore();
 
 
-        CreditManager creditManager = CreditManager.getInstance();
-        CreditScore creditScore = creditManager.getCreditScore();
+        CreditManagerFactory creditManagerFactory = CreditManagerFactory.getInstance();
+
+        creditManagerFactory.get().parallelStream().forEach(creditManager -> {
+
+            CreditScore creditScore = creditManager.getCreditScore();
+            creditScore.setBureau(creditManager.bureau);
+            combinedCreditScore.addScore(creditScore);
+
+        });
 
 
-        String responseStr = JSONUtil.toJSON(creditScore);
+
+        String responseStr = JSONUtil.toJSON(combinedCreditScore);
         EncryptedMessage response =  keyExchangeManager.encryptResponse(responseStr,request);
         keyExchangeManager.sign(response);
         return response;

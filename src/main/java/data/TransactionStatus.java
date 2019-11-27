@@ -10,7 +10,7 @@ public class TransactionStatus {
 
      Status status;
 
-     CreditScore creditScore;
+     CombinedCreditScore creditScore;
 
     @JsonProperty
 
@@ -23,11 +23,11 @@ public class TransactionStatus {
     }
 
     @JsonProperty
-    public CreditScore getCreditScore() {
+    public CombinedCreditScore getCreditScore() {
         return creditScore;
     }
 
-    public void setCreditScore(CreditScore creditScore) {
+    public void setCreditScore(CombinedCreditScore creditScore) {
         this.creditScore = creditScore;
     }
 

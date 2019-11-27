@@ -148,11 +148,11 @@ public class SPResource {
             e.printStackTrace();
         }
 
-        CreditScore score = (CreditScore) JSONUtil.fromJSON(bureauResponse,CreditScore.class);
+        CombinedCreditScore score = (CombinedCreditScore) JSONUtil.fromJSON(bureauResponse,CombinedCreditScore.class);
 
         TransactionStatus transactionStatus = new TransactionStatus();
 
-        if (score.getScore() > 600)
+        if (score.getScore() > 1800)
         {
             transactionStatus.setStatus(TransactionStatus.Status.Approved);
         }

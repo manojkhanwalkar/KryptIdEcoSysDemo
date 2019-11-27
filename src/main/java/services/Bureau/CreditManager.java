@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class CreditManager {
 
-    static class CreditManagerHolder {
+   /* static class CreditManagerHolder {
 
         static CreditManager creditManager = new CreditManager();
 
@@ -20,7 +20,14 @@ public class CreditManager {
     private CreditManager()
     {
 
-    }
+    }*/
+
+   CreditManagerFactory.Bureaus bureau;
+
+   public CreditManager(CreditManagerFactory.Bureaus bureau)
+   {
+       this.bureau = bureau;
+   }
 
     Random random = new Random();
 
