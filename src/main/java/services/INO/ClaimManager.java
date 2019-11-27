@@ -15,6 +15,8 @@ import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static util.ClaimValidator.isValidClaim;
 
@@ -119,16 +121,30 @@ public class ClaimManager {
     public VerifiedClaim verifyIdentityAndGenerateClaim(VerifyRequest request)
     {
 
-        VerifiedClaim verifiedClaim1 = inoMock1.verifyIdentityAndGenerateClaim(request);
-        VerifiedClaim verifiedClaim2 = inoMock2.verifyIdentityAndGenerateClaim(request);
-        VerifiedClaim verifiedClaim3 = inoMock3.verifyIdentityAndGenerateClaim(request);
+        try {
+            CompletableFuture<VerifiedClaim> verifiedClaim1
+                    = CompletableFuture.supplyAsync(() -> inoMock1.verifyIdentityAndGenerateClaim(request));
 
-        VerifiedClaim superClaim = generateSuperClaim(verifiedClaim1,verifiedClaim2,verifiedClaim3);
+            CompletableFuture<VerifiedClaim> verifiedClaim2
+                    = CompletableFuture.supplyAsync(() -> inoMock2.verifyIdentityAndGenerateClaim(request));
 
-        //System.out.println(JSONUtil.toPrettyJSON(superClaim));
+            CompletableFuture<VerifiedClaim> verifiedClaim3
+                    = CompletableFuture.supplyAsync(() -> inoMock3.verifyIdentityAndGenerateClaim(request));
 
-        return superClaim;
 
+            VerifiedClaim superClaim = generateSuperClaim(verifiedClaim1.get(),verifiedClaim2.get(),verifiedClaim3.get());
+
+            //System.out.println(JSONUtil.toPrettyJSON(superClaim));
+
+            return superClaim;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+
+        return null;
     }
 
 
