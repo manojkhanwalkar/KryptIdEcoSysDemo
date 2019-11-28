@@ -37,6 +37,28 @@ public class AdjacencyMatrix {
 
     }
 
+    public void deleteNode(int node)
+    {
+        int[][] array1 = new int[nodes-1][nodes-1];
+        int row=0; int col=0;
+        for (int i=0;i<nodes;i++)
+        {
+            if (i==node)
+                continue;
+            col=0;
+            for (int j=0;j<nodes;j++) {
+                if (j == node)
+                    continue;
+
+             array1[row][col] = array[i][j];
+             col++;
+            }
+           row++;
+        }
+
+        nodes--;
+    }
+
     public void addEdge(int src, int tgt) {
         array[src][tgt] = 1;
     }
@@ -88,6 +110,13 @@ public class AdjacencyMatrix {
 
         System.out.println(matrix.getOutgoingEdges(2));
         System.out.println(matrix.getIncomingEdges(4));
+
+        matrix.deleteNode(5);
+
+        System.out.println(matrix.getOutgoingEdges(2));
+        System.out.println(matrix.getIncomingEdges(4));
+
+
 
 
 
