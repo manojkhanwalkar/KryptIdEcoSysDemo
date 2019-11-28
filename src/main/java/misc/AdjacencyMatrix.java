@@ -63,6 +63,11 @@ public class AdjacencyMatrix {
         array[src][tgt] = 1;
     }
 
+    public void deleteEdge(int src,int tgt)
+    {
+        array[src][tgt] = 0;
+    }
+
     public List<Integer> getIncomingEdges(int node)
     {
         List<Integer> edges = new ArrayList<>();
