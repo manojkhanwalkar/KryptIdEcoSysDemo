@@ -18,6 +18,7 @@ public class PageRank {
         populateInitialRank();
     }
 
+
     private void populateWeights()
     {
         weights = new double[matrix.nodes];
