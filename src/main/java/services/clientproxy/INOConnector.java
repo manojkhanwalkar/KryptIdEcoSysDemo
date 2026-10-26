@@ -85,9 +85,15 @@ public class INOConnector {
 
             request.setRsaCert(CertUtil.getCertAsString(wallet.getRsaCertificate()));
 
-            String str = JSONUtil.toJSON(request);
+            // INO enforces single-use nonces on /verify; fetch one if the caller did not supply it
+            if (request.getNonce() == null) {
+                Nonces nonces = getNonces();
+                if (nonces == null || nonces.getNonces() == null || nonces.getNonces().isEmpty())
+                    throw new IllegalStateException("Could not obtain a nonce from INO");
+                request.setNonce(nonces.getNonces().get(0));
+            }
 
-            System.out.println("Sending verify request " + str);
+            String str = JSONUtil.toJSON(request);
 
 
             String response = ino.send(str,"verify");
@@ -116,7 +122,6 @@ public class INOConnector {
 
         String str = JSONUtil.toJSON(transactionNumber);
 
-        System.out.println("Sending claim request " + str);
 
 
         String response = ino.send(str,"claim");
@@ -141,18 +146,17 @@ public class INOConnector {
     {
         EncryptedVerifiedClaim encryptedVerifiedClaim = (EncryptedVerifiedClaim) JSONUtil.fromJSON(response,EncryptedVerifiedClaim.class);
 
-        System.out.println("Received encrypted claim " + encryptedVerifiedClaim);
 
 
         VerifiedClaim claim = convert(encryptedVerifiedClaim,privateKey);
 
 
-        isValidClaim(claim);
+        if (!isValidClaim(claim))
+            throw new SecurityException("Received claim failed validation");
 
 
 
 
-        System.out.println("claim after decrypting " + claim);
 
 
         return claim;
@@ -295,7 +299,6 @@ public static INOConnector buildINOConnector()
 
         Identity identity = MerkleTreeUtil.getIdentityAttributes(tree);
 
-        System.out.println(identity);
 
         // iterate over add attribute request and set it on identity
 

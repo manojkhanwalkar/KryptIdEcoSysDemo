@@ -109,11 +109,16 @@ public class SPResource {
         // Encrypted Verified claim to be processed here .
         EncryptedVerifiedClaim encryptedVerifiedClaim = (EncryptedVerifiedClaim) JSONUtil.fromJSON(requestStr,EncryptedVerifiedClaim.class);
 
-        VerifiedClaim claim = convert(encryptedVerifiedClaim,rsaKeyHolder.getPrivateKey());
+        VerifiedClaim claim;
+        try {
+            claim = convert(encryptedVerifiedClaim,rsaKeyHolder.getPrivateKey());
+        } catch (SecurityException e) {
+            throw new javax.ws.rs.WebApplicationException("Claim could not be decrypted", javax.ws.rs.core.Response.Status.BAD_REQUEST);
+        }
 
-        isValidClaim(claim);
-
-        System.out.println(claim);
+        // reject forged or tampered claims: issuer must be the pinned INO claim key
+        if (!isValidClaim(claim))
+            throw new javax.ws.rs.WebApplicationException("Invalid claim", javax.ws.rs.core.Response.Status.FORBIDDEN);
 
       //  requestStr = JSONUtil.toJSON(claim);
 
@@ -146,9 +151,12 @@ public class SPResource {
             bureauResponse = bureau.send(requestStr,"report");
         } catch (Exception e) {
             e.printStackTrace();
+            throw new javax.ws.rs.WebApplicationException("Credit bureau unavailable", javax.ws.rs.core.Response.Status.BAD_GATEWAY);
         }
 
         CombinedCreditScore score = (CombinedCreditScore) JSONUtil.fromJSON(bureauResponse,CombinedCreditScore.class);
+        if (score == null)
+            throw new javax.ws.rs.WebApplicationException("Invalid credit bureau response", javax.ws.rs.core.Response.Status.BAD_GATEWAY);
 
         TransactionStatus transactionStatus = new TransactionStatus();
 

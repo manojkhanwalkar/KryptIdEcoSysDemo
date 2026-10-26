@@ -20,6 +20,12 @@ public class SessionKeyCache {
         cache.put(sessionId,util);
     }
 
+    public void remove(String sessionId)
+    {
+        if (sessionId != null)
+            cache.remove(sessionId);
+    }
+
     public DHUtil get(String sessionId)
     {
         return cache.get(sessionId);

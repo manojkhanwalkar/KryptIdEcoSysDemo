@@ -83,7 +83,7 @@ class HealthTimerTask implements Runnable
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if (response.toLowerCase().contains("false"))
+                if (response == null || response.toLowerCase().contains("false"))
                 {
                     instance.setServiceStatus(ServiceStatus.Status.Down);
                 }

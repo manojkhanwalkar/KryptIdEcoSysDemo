@@ -43,6 +43,8 @@ public class ClaimManager {
 
     INOMock inoMock1, inoMock2, inoMock3;
 
+    private final List<X509Certificate> subValidatorCerts;
+
 
     public ClaimManager() {
 
@@ -58,6 +60,10 @@ public class ClaimManager {
         inoMock2 = new EmailValidator(certFile2,privateFile2);
         inoMock3 = new SSNValidator(certFile3,privateFile3);
 
+        // sub-claims are only accepted from the three configured validators
+        subValidatorCerts = java.util.Arrays.asList(CertUtil.getCertificate(certFile1),
+                CertUtil.getCertificate(certFile2), CertUtil.getCertificate(certFile3));
+
      }
 
 
@@ -68,7 +74,7 @@ public class ClaimManager {
         // validate tree and signature of each ino before merging
         for (VerifiedClaim claim : verifiedClaims)
         {
-            if (!isValidClaim(claim))
+            if (!isValidClaim(claim, subValidatorCerts))
                 throw new RuntimeException("Claim is invalid");
         }
 
