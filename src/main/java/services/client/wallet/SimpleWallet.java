@@ -121,7 +121,7 @@ public class SimpleWallet {
         if (simpleWalletRecord!=null) {
 
             mapper.delete(simpleWalletRecord);
-            System.out.println("Deleted " + simpleWalletRecord);
+            System.out.println("Deleted wallet key for claim " + simpleWalletRecord.getClaimId());
         }
 
     }

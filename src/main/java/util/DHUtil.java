@@ -63,8 +63,9 @@ public class DHUtil {
             otherPublicKey = publickey;
 
             sessionKey = generateKey();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
+        } catch (InvalidKeyException | IllegalStateException e) {
+            // e.g. a peer key on a different curve - reject the key exchange instead of continuing without a key
+            throw new SecurityException("Key agreement failed", e);
         }
     }
 
@@ -78,9 +79,9 @@ public class DHUtil {
             byte[] encVal = c.doFinal(msg.getBytes());
             return new String(Base64.getEncoder().encode(encVal));
         } catch (Exception  e) {
-            e.printStackTrace();
+            // fail closed: never fall back to sending the plaintext
+            throw new IllegalStateException("Encryption failed", e);
         }
-        return msg;
     }
 
     public  String decrypt(String encryptedData, String iv) {
@@ -92,9 +93,9 @@ public class DHUtil {
             byte[] decValue = c.doFinal(decordedValue);
             return new String(decValue);
         } catch (Exception e) {
-            e.printStackTrace();
+            // fail closed: never treat undecryptable input as if it were plaintext
+            throw new SecurityException("Decryption failed");
         }
-        return encryptedData;
     }
 
 
@@ -109,9 +110,8 @@ public class DHUtil {
         try {
             serializedJwe = jwe.getCompactSerialization();
         } catch (JoseException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("JWE encryption failed", e);
         }
-        System.out.println("Serialized Encrypted JWE: " + serializedJwe);
         return serializedJwe;
     }
 
@@ -126,14 +126,10 @@ public class DHUtil {
         jwe.setKey(sessionKey);
         try {
             jwe.setCompactSerialization(serializedJwe);
-            System.out.println("Payload: " + jwe.getPayload());
-
             return jwe.getPayload();
         } catch (JoseException e) {
-            e.printStackTrace();
+            throw new SecurityException("JWE decryption failed");
         }
-
-        return null;
 
     }
 

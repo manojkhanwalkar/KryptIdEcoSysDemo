@@ -37,11 +37,33 @@ public class HMACUtil {
     }
 
 
+    /** Environment variable (or system property {@code kryptid.hmac.key}) holding the shared HMAC key. */
+    public static final String HMAC_KEY_ENV = "KRYPTID_HMAC_KEY";
+
+    /**
+     * The shared request-HMAC key. It is deliberately not hard-coded: a key in source is known to anyone
+     * with the repository. Returns null when not configured; servers must then reject HMAC-protected calls.
+     */
+    public static String configuredKey()
+    {
+        String key = System.getProperty("kryptid.hmac.key");
+        if (key == null || key.isEmpty())
+            key = System.getenv(HMAC_KEY_ENV);
+        if (key == null || key.length() < 32)
+            return null;   // missing or too short to be a real secret
+        return key;
+    }
+
+    /** Constant-time HMAC check; false for a missing value or key. */
     public static boolean isValid(String hmac , String data , String key)
     {
-
-        return hmac.equals(calculateHMAC(data,key));
-
+        if (hmac == null || data == null || key == null)
+            return false;
+        String computed = calculateHMAC(data,key);
+        if (computed == null)
+            return false;
+        return java.security.MessageDigest.isEqual(computed.getBytes(java.nio.charset.StandardCharsets.UTF_8),
+                hmac.getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
 
     public static void main(String[] args) throws Exception {

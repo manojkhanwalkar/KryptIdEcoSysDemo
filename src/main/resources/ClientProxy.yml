@@ -7,6 +7,8 @@ server:
   applicationConnectors:
     - type: https
       port: 8780
+      # the client proxy holds the user's wallet and exposes unauthenticated delete endpoints: local access only
+      bindHost: 127.0.0.1
       keyStorePath: /home/manoj/IdeaProjects/securitytest/src/main/resources/mytestkey.jks
       keyStorePassword: password
     #this requires the alpn-boot library on the JVM's boot classpath
@@ -17,5 +19,7 @@ server:
   adminConnectors:
     - type: https
       port: 8781
+      # the client proxy holds the user's wallet and exposes unauthenticated delete endpoints: local access only
+      bindHost: 127.0.0.1
       keyStorePath: /home/manoj/IdeaProjects/securitytest/src/main/resources/mytestkey.jks
       keyStorePassword: password

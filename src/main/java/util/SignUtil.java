@@ -84,10 +84,8 @@ public class SignUtil {
         String jwsCompactSerialization = null;
         try {
             jwsCompactSerialization = jws.getCompactSerialization();
-
-            System.out.println(jwsCompactSerialization);
         } catch (JoseException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("JWS signing failed", e);
         }
         signatureContainer.setCertStr(certStr);
         signatureContainer.setSignature(jwsCompactSerialization);
@@ -99,7 +97,12 @@ public class SignUtil {
 
     public synchronized boolean  verify(SignatureContainer signatureContainer, String message) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, UnsupportedEncodingException, SignatureException {
 
-       Signature ecdsaVerify = Signature.getInstance(signatureContainer.getAlgorithm());
+       if (signatureContainer == null || signatureContainer.getSignature() == null || signatureContainer.getCertStr() == null)
+           return false;
+       // the algorithm is fixed by the protocol; never let the sender choose it
+       if (!ALGO.equals(signatureContainer.getAlgorithm()))
+           return false;
+       Signature ecdsaVerify = Signature.getInstance(ALGO);
 
      /*   KeyFactory kf = KeyFactory.getInstance("EC");
 
@@ -119,6 +122,26 @@ public class SignUtil {
     }
 
 
+    /**
+     * Verifies the JWS and that it signs exactly {@code expectedPayload}; a valid JWS over some other
+     * content must not be accepted as a signature of this message.
+     */
+    public boolean verifyJWS(JavaWebSignatureContainer jwsContainer, String expectedPayload) {
+        if (jwsContainer == null || jwsContainer.getSignature() == null || jwsContainer.getCertStr() == null)
+            return false;
+        if (!verifyJWS(jwsContainer))
+            return false;
+        try {
+            JsonWebSignature jws = new JsonWebSignature();
+            jws.setAlgorithmConstraints(new org.jose4j.jwa.AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, AlgorithmIdentifiers.ECDSA_USING_P256_CURVE_AND_SHA256));
+            jws.setCompactSerialization(jwsContainer.getSignature());
+            jws.setKey(CertUtil.getCertFromString(jwsContainer.getCertStr()).getPublicKey());
+            return jws.verifySignature() && expectedPayload != null && expectedPayload.equals(jws.getPayload());
+        } catch (JoseException e) {
+            return false;
+        }
+    }
+
     public boolean verifyJWS(JavaWebSignatureContainer jwsContainer) {
         PublicKey publicKey = CertUtil.getCertFromString(jwsContainer.getCertStr()).getPublicKey();
 
@@ -132,9 +155,8 @@ public class SignUtil {
             jws.setKey(publicKey);
             signatureVerified = jws.verifySignature();
         } catch (JoseException e) {
-            e.printStackTrace();
+            signatureVerified = false;
         }
-        System.out.println("JWS Signature is valid: " + signatureVerified);
 
         return signatureVerified;
 

@@ -64,8 +64,12 @@ public class Connection {
 
     private void initConnectionProps()
     {
-        final Properties props = System.getProperties();
-        props.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
+        // Hostname verification stays on by default. Disabling it JVM-wide lets anyone with a certificate
+        // trusted by this JVM impersonate any service; allow it only as an explicit, local-dev opt-in.
+        if ("true".equalsIgnoreCase(System.getenv("KRYPTID_DISABLE_HOSTNAME_VERIFICATION"))) {
+            final Properties props = System.getProperties();
+            props.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
+        }
 
     }
 
@@ -165,66 +169,65 @@ public class Connection {
     }
 
 
+    /** Base64 certificate the server presented during key exchange; responses must be signed by it. */
+    String serverCertStr;
+
+    private void requireServerCert(String signerCertStr)
+    {
+        if (serverCertStr == null || signerCertStr == null
+                || !MessageDigest.isEqual(serverCertStr.getBytes(), signerCertStr.getBytes()))
+            throw new SecurityException("Response not signed by the server certificate from the key exchange");
+    }
+
     private void verify(JavaWebEncryptedMessage encryptedMessage)
     {
+        if (encryptedMessage == null || encryptedMessage.getContainer() == null || encryptedMessage.getMessage() == null)
+            throw new SecurityException("Unsigned response");
+        requireServerCert(encryptedMessage.getContainer().getCertStr());
+        boolean valid;
         try {
-            boolean verify =  verifySig.verify(encryptedMessage.getContainer(),encryptedMessage.getMessage());
-            System.out.println("Message signature has been verified " + verify);
-
-
-
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
+            valid = verifySig.verify(encryptedMessage.getContainer(),encryptedMessage.getMessage());
+        } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+            valid = false;
         }
-
+        if (!valid)
+            throw new SecurityException("Invalid response signature");
     }
 
 
     private void verify(EncryptedMessage encryptedMessage)
     {
+        if (encryptedMessage == null || encryptedMessage.getContainer() == null
+                || encryptedMessage.getJwsContainer() == null || encryptedMessage.getMessage() == null)
+            throw new SecurityException("Unsigned response");
+        requireServerCert(encryptedMessage.getContainer().getCertStr());
+        requireServerCert(encryptedMessage.getJwsContainer().getCertStr());
+        boolean valid;
         try {
-            boolean verify =  verifySig.verify(encryptedMessage.getContainer(),encryptedMessage.getMessage());
-             System.out.println("Message signature has been verified " + verify);
-
-             verify =  verifySig.verifyJWS(encryptedMessage.getJwsContainer());
-
-            System.out.println("Message JWS signature has been verified " + verify);
-
-
-
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
+            valid = verifySig.verify(encryptedMessage.getContainer(),encryptedMessage.getMessage())
+                    && verifySig.verifyJWS(encryptedMessage.getJwsContainer(), encryptedMessage.getMessage());
+        } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+            valid = false;
         }
+        if (!valid)
+            throw new SecurityException("Invalid response signature");
     }
-
-    static String HmacKey = "SecretKeyForHMACCalculation";   // in real life this will be taken from a secure location.
 
     private String post(String str , String url) throws Exception
     {
 
-        HttpRequest httprequest = HttpRequest.newBuilder()
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(target + url))
                 .header("Content-Type", "application/json")
-                 .header("HMAC" , HMACUtil.calculateHMAC(str,HmacKey))
                 .POST(HttpRequest.BodyPublishers.ofString(str))
-                .timeout(Duration.ofMinutes(1))
-                .build();
+                .timeout(Duration.ofMinutes(1));
+
+        // shared key comes from KRYPTID_HMAC_KEY; services that require the header reject requests without it
+        String hmacKey = HMACUtil.configuredKey();
+        if (hmacKey != null)
+            builder.header("HMAC" , HMACUtil.calculateHMAC(str,hmacKey));
+
+        HttpRequest httprequest = builder.build();
 
 
         HttpResponse<String> response =
@@ -282,7 +285,10 @@ public class Connection {
 
         KeyExchange results = (KeyExchange) JSONUtil.fromJSON(response,KeyExchange.class);
 
+        if (results == null || results.getCertStr() == null)
+            throw new SecurityException("Invalid key exchange response");
         String responseCertStr = results.getCertStr();
+        serverCertStr = responseCertStr;
 
         PublicKey pubKey = CertUtil.getCertFromString(responseCertStr).getPublicKey();
 

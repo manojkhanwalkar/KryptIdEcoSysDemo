@@ -59,7 +59,7 @@ public class SimpleWalletRecord {
         return "SimpleWalletRecord{" +
                 "claimId='" + claimId + '\'' +
                 ", publicKey='" + publicKey + '\'' +
-                ", privateKey='" + privateKey + '\'' +
+                ", privateKey='****'" +   // never print the wallet private key
                 ", certificate='" + certificate + '\'' +
                 '}';
     }

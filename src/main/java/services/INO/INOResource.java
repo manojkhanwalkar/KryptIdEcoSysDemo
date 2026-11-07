@@ -19,6 +19,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.WebApplicationException;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -81,27 +83,24 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
 
     LogManager logManager = new LogManager();
 
-    static String HmacKey = "SecretKeyForHMACCalculation";   // in real life this will be taken from a secure location.
+    private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(INOResource.class.getName());
 
-
-
-    private boolean validateHMAC(String request, HttpHeaders headers)
+    // Shared HMAC key from KRYPTID_HMAC_KEY (see HMACUtil.configuredKey); never hard-coded.
+    private void validateHMAC(String request, HttpHeaders headers)
     {
-        String value = headers.getRequestHeader("HMAC").get(0);
-
-        String compute = HMACUtil.calculateHMAC(request, HmacKey);
-        if (value.equals(compute)) {
-            System.out.println("HMAC has been validated ");
-            return true;
-        }
-        else {
-            System.out.println("HAMC validation failed");
-
-            System.out.println("HMAC Received " + value);
-            System.out.println("HMAC Computed " + compute);
-            return false;
+        String key = HMACUtil.configuredKey();
+        if (key == null) {
+            LOG.severe("KRYPTID_HMAC_KEY is not configured (min 32 chars); rejecting HMAC-protected request");
+            throw new WebApplicationException("HMAC key not configured", Response.Status.SERVICE_UNAVAILABLE);
         }
 
+        java.util.List<String> values = headers == null ? null : headers.getRequestHeader("HMAC");
+        String value = (values == null || values.isEmpty()) ? null : values.get(0);
+
+        if (!HMACUtil.isValid(value, request, key)) {
+            LOG.warning("HMAC validation failed for /verify request");
+            throw new WebApplicationException("Invalid HMAC", Response.Status.UNAUTHORIZED);
+        }
     }
 
     @POST
@@ -120,11 +119,16 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
         String requestStr = keyExchangeManager.decryptRequest(request);
 
         VerifyRequest verifyRequest = (VerifyRequest) JSONUtil.fromJSON(requestStr,VerifyRequest.class);
-        System.out.println(verifyRequest);
+        if (verifyRequest == null || verifyRequest.getIdentity() == null || verifyRequest.getRsaCert() == null)
+            throw new WebApplicationException("Malformed verify request", Response.Status.BAD_REQUEST);
 
-        boolean nonceVerified = claimCache.verifyNonce(verifyRequest.getNonce());
-
-        System.out.println("Valid Nonce received " + nonceVerified);
+        // replay protection: each verify request must carry a fresh, single-use nonce issued by /nonce
+        boolean nonceVerified = verifyRequest.getNonce() != null && verifyRequest.getNonce().getNonce() != null
+                && claimCache.verifyNonce(verifyRequest.getNonce());
+        if (!nonceVerified) {
+            LOG.warning("Rejected verify request with missing, unknown or reused nonce");
+            throw new WebApplicationException("Invalid nonce", Response.Status.UNAUTHORIZED);
+        }
 
         //logManager.submit(verifyRequest);
 
@@ -146,7 +150,12 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
 
 
 
+        if (claim == null)
+            throw new WebApplicationException("Identity verification failed", Response.Status.INTERNAL_SERVER_ERROR);
+
         X509Certificate rsaCertificate = CertUtil.getCertFromString(verifyRequest.getRsaCert());
+        if (rsaCertificate == null)
+            throw new WebApplicationException("Invalid RSA certificate", Response.Status.BAD_REQUEST);
 
         PublicKey rsaPublicKey = rsaCertificate.getPublicKey();
 
@@ -179,7 +188,6 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
         // ignore the request as the function just has to return all claim id's . Get not used here to enable the sender to be verified.
 
         //    VerifyRequest verifyRequest = (VerifyRequest) JSONUtil.fromJSON(requestStr,VerifyRequest.class);
-        System.out.println(requestStr);
 
         //logManager.submit(verifyRequest);
 
@@ -210,7 +218,6 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
         // ignore the request as the function just has to return all claim id's . Get not used here to enable the sender to be verified.
 
         //    VerifyRequest verifyRequest = (VerifyRequest) JSONUtil.fromJSON(requestStr,VerifyRequest.class);
-        System.out.println(requestStr);
 
         //logManager.submit(verifyRequest);
 
@@ -243,7 +250,6 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
 
             Identity otherValue = mapper.readValue(bytes, Identity.class);
 
-            System.out.println(otherValue);
 
 
             byte[] cborData = mapper.writeValueAsBytes(nonces);
@@ -274,7 +280,6 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
         // ignore the request as the function just has to return all claim id's . Get not used here to enable the sender to be verified.
 
     //    VerifyRequest verifyRequest = (VerifyRequest) JSONUtil.fromJSON(requestStr,VerifyRequest.class);
-        System.out.println(requestStr);
 
         //logManager.submit(verifyRequest);
 
@@ -305,7 +310,6 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
         keyExchangeManager.verify(request);
         String claimId = keyExchangeManager.decryptRequest(request);
 
-        System.out.println(claimId);
 
         claimCache.deleteClaim(claimId);
 
@@ -356,7 +360,6 @@ VerifiedClaimCache claimCache = new VerifiedClaimCache();
         String requestStr = keyExchangeManager.decryptRequest(request);
 
         TransactionNumber transactionNumber = (TransactionNumber) JSONUtil.fromJSON(requestStr,TransactionNumber.class);
-        System.out.println(transactionNumber);
 
 
          EncryptedVerifiedClaim encryptedVerifiedClaim = claimCache.get(transactionNumber.getTransactionId());
